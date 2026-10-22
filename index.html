@@ -30,6 +30,8 @@
   --policy-border: rgba(255, 224, 130, 0.15);
   --policy-title: #FFD54F;
   --confirm-green: #81C784;
+  --danger: #ef5350;
+  --danger-wash: rgba(239,83,80,0.1);
   --whatsapp-bg: rgba(129, 199, 132, 0.08);
   --disabled: #3a2e36;
   --coming-bg: rgba(255, 255, 255, 0.03);
@@ -63,6 +65,8 @@
     --policy-border: #FFE082;
     --policy-title: #F57F17;
     --confirm-green: #2E7D32;
+    --danger: #c62828;
+    --danger-wash: rgba(198,40,40,0.08);
     --whatsapp-bg: #E8F5E9;
     --disabled: #e0d4da;
     --coming-bg: rgba(0, 0, 0, 0.02);
@@ -96,6 +100,8 @@
   --policy-border: #FFE082;
   --policy-title: #F57F17;
   --confirm-green: #2E7D32;
+  --danger: #c62828;
+  --danger-wash: rgba(198,40,40,0.08);
   --whatsapp-bg: #E8F5E9;
   --disabled: #e0d4da;
   --coming-bg: rgba(0, 0, 0, 0.02);
@@ -123,6 +129,9 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+}
+#root.admin-mode {
+  max-width: 900px;
 }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
@@ -153,63 +162,83 @@ body {
 <body>
 <div id="root"></div>
 <script>
-const e = React.createElement;
-const { useState } = React;
+var e = React.createElement;
+var useState = React.useState;
+var useEffect = React.useEffect;
+var useRef = React.useRef;
 
-const SERVICES = [
-  { id: 1, name: "BIAB Manicure", duration: "1 hr 15 min", price: "£42", category: "nails", desc: "Builder gel manicure for natural nail strength and a flawless finish", icon: "💅" },
-  { id: 2, name: "BIAB Manicure with Art", duration: "1 hr 30 min", price: "£48", category: "nails", desc: "Builder gel manicure with bespoke nail art designs", icon: "✨" },
-  { id: 3, name: "Gel Toe Paint", duration: "45 min", price: "£40", category: "nails", desc: "Gel polish application for perfectly polished toes", icon: "🦶" },
-  { id: 4, name: "Gel Pedicure", duration: "1 hr", price: "£48", category: "nails", desc: "Full gel pedicure with foot care and polish", icon: "🌸" },
+/* ═══════════════════════════════════════
+   DATA / STORAGE LAYER
+   ═══════════════════════════════════════ */
+
+var DEFAULT_SERVICES = [
+  { id: 1, name: "BIAB Manicure", duration: "1 hr 15 min", durationMin: 75, price: 42, category: "nails", desc: "Builder gel manicure for natural nail strength and a flawless finish", icon: "\u{1F485}", active: true },
+  { id: 2, name: "BIAB Manicure with Art", duration: "1 hr 30 min", durationMin: 90, price: 48, category: "nails", desc: "Builder gel manicure with bespoke nail art designs", icon: "✨", active: true },
+  { id: 3, name: "Gel Toe Paint", duration: "45 min", durationMin: 45, price: 40, category: "nails", desc: "Gel polish application for perfectly polished toes", icon: "\u{1F9B6}", active: true },
+  { id: 4, name: "Gel Pedicure", duration: "1 hr", durationMin: 60, price: 48, category: "nails", desc: "Full gel pedicure with foot care and polish", icon: "\u{1F338}", active: true },
 ];
 
-const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const SLOTS = ["09:00","10:30","12:00","13:30","15:00","16:30"];
+var DEFAULT_AVAILABILITY = {
+  days: { 0: false, 1: true, 2: true, 3: true, 4: true, 5: true, 6: false },
+  startTime: "09:00",
+  endTime: "18:00",
+  slotInterval: 90,
+  blockedDates: [],
+};
 
-function genDays(y,m){ const f=new Date(y,m,1).getDay(), n=new Date(y,m+1,0).getDate(), d=[]; for(let i=0;i<f;i++) d.push(null); for(let i=1;i<=n;i++) d.push(i); return d; }
+var DEFAULT_SETTINGS = {
+  businessName: "abigaillnails",
+  tagline: "Stokenchurch",
+  phone: "",
+  instagram: "https://www.instagram.com/abigaillnails/",
+  cancellationHours: 24,
+  cancellationPolicy: "Please provide at least 24 hours' notice for cancellations or changes. Late cancellations or no-shows may affect future booking availability.",
+};
 
-/* ── Decorative background particles ── */
-function Particles() {
-  const dots = [];
-  for (let i = 0; i < 20; i++) {
-    dots.push(e("div", {
-      key: i,
-      style: {
-        position: "absolute",
-        width: Math.random() * 3 + 1,
-        height: Math.random() * 3 + 1,
-        borderRadius: "50%",
-        background: "var(--accent)",
-        opacity: Math.random() * 0.15 + 0.03,
-        left: Math.random() * 100 + "%",
-        top: Math.random() * 100 + "%",
-        animation: "float " + (3 + Math.random() * 4) + "s ease-in-out infinite",
-        animationDelay: -Math.random() * 4 + "s",
-      }
-    }));
+var DEFAULT_PIN = "1234";
+
+function loadData(key, fallback) {
+  try { var d = localStorage.getItem("aby_" + key); return d ? JSON.parse(d) : fallback; }
+  catch(ex) { return fallback; }
+}
+function saveData(key, val) {
+  try { localStorage.setItem("aby_" + key, JSON.stringify(val)); } catch(ex) {}
+}
+
+function generateSlots(startTime, endTime, intervalMin) {
+  var slots = [];
+  var sh = parseInt(startTime.split(":")[0]), sm = parseInt(startTime.split(":")[1]);
+  var eh = parseInt(endTime.split(":")[0]), em = parseInt(endTime.split(":")[1]);
+  var startM = sh * 60 + sm, endM = eh * 60 + em;
+  for (var m = startM; m + intervalMin <= endM; m += intervalMin) {
+    var h = Math.floor(m / 60), mi = m % 60;
+    slots.push((h < 10 ? "0" : "") + h + ":" + (mi < 10 ? "0" : "") + mi);
   }
-  return e("div", {
-    style: { position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" },
-    "aria-hidden": "true"
-  }, dots);
+  return slots;
 }
 
-/* ── Decorative line separator ── */
-function Divider() {
-  return e("div", {
-    style: {
-      display: "flex", alignItems: "center", gap: 12,
-      margin: "24px 0", padding: "0 20px",
-    }
-  },
-    e("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, var(--accent), transparent)", opacity: 0.3 } }),
-    e("div", { style: { color: "var(--accent)", fontSize: 10, opacity: 0.5 } }, "✦"),
-    e("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, var(--accent), transparent)", opacity: 0.3 } })
-  );
+function fmtPrice(p) { return "£" + p; }
+
+function fmtDuration(mins) {
+  if (mins < 60) return mins + " min";
+  var h = Math.floor(mins / 60), m = mins % 60;
+  return h + " hr" + (m > 0 ? " " + m + " min" : "");
 }
 
-const s = {
+var DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function genDays(y,m) { var f=new Date(y,m,1).getDay(), n=new Date(y,m+1,0).getDate(), d=[]; for(var i=0;i<f;i++) d.push(null); for(var i=1;i<=n;i++) d.push(i); return d; }
+
+var LOGO_B64 = "data:image/jpeg;base64,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";
+
+
+/* ═══════════════════════════════════════
+   SHARED STYLES
+   ═══════════════════════════════════════ */
+
+var s = {
   header: {
     display:"flex", justifyContent:"space-between", alignItems:"center",
     padding:"16px 24px",
@@ -219,253 +248,217 @@ const s = {
     position:"sticky", top:0, zIndex:10,
   },
   logoArea: { display:"flex", alignItems:"center", gap:14 },
-  logoCircle: {
-    width:44, height:44, borderRadius:"50%",
-    overflow:"hidden",
-    boxShadow: "var(--glow-sm)",
-    flexShrink:0,
-  },
-  logoImg: {
-    width:"100%", height:"100%", objectFit:"cover", display:"block",
-  },
-  brandName: {
-    fontSize:18, fontWeight:700, margin:0, letterSpacing:-0.3,
-    fontFamily: "'Dancing Script', cursive",
-    color: "var(--accent-glow)",
-  },
+  logoCircle: { width:44, height:44, borderRadius:"50%", overflow:"hidden", boxShadow: "var(--glow-sm)", flexShrink:0 },
+  logoImg: { width:"100%", height:"100%", objectFit:"cover", display:"block" },
+  brandName: { fontSize:18, fontWeight:700, margin:0, letterSpacing:-0.3, fontFamily: "'Dancing Script', cursive", color: "var(--accent-glow)" },
   tagline: { fontSize:11, color:"var(--fg-faint)", margin:0, fontWeight:300, letterSpacing:1, textTransform:"uppercase" },
-  backBtn: {
-    background:"none", border:"1px solid var(--border-accent)", color:"var(--accent)",
-    fontSize:13, fontWeight:500, cursor:"pointer", padding:"8px 16px",
-    borderRadius:20, letterSpacing:0.3, transition:"all 0.2s",
-  },
+  backBtn: { background:"none", border:"1px solid var(--border-accent)", color:"var(--accent)", fontSize:13, fontWeight:500, cursor:"pointer", padding:"8px 16px", borderRadius:20, letterSpacing:0.3, transition:"all 0.2s" },
   content: { flex:1, padding:"0 24px 32px", position:"relative", zIndex:1 },
-
-  /* ── Hero ── */
-  heroBanner: {
-    position:"relative", overflow:"hidden",
-    background: "linear-gradient(135deg, rgba(232,160,191,0.12) 0%, rgba(198,122,158,0.08) 50%, rgba(232,160,191,0.05) 100%)",
-    borderRadius:20, padding:"48px 28px 44px", textAlign:"center", margin:"20px 0 28px",
-    border:"1px solid var(--border-accent)",
-    backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
-  },
-  heroScript: {
-    fontSize:38, fontWeight:700, margin:0,
-    fontFamily: "'Dancing Script', cursive",
-    color: "var(--accent-glow)",
-    animation: "glowPulse 4s ease-in-out infinite",
-    lineHeight: 1.1,
-  },
-  heroTitle: {
-    fontSize:14, fontWeight:400, margin:"12px 0 0",
-    letterSpacing:3, textTransform:"uppercase",
-    color:"var(--fg-muted)",
-  },
-  heroLine: {
-    width:60, height:1, margin:"16px auto 0",
-    background:"linear-gradient(to right, transparent, var(--accent), transparent)",
-  },
-
-  /* ── CTA ── */
-  primaryAction: {
-    width:"100%", padding:"20px 24px",
-    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
-    color:"#fff", border:"none", borderRadius:16,
-    display:"flex", alignItems:"center", justifyContent:"center", gap:12,
-    cursor:"pointer", fontSize:16, fontWeight:600,
-    boxShadow: "var(--glow)",
-    transition:"all 0.3s ease",
-    letterSpacing:0.5,
-  },
-
-  /* ── Info cards ── */
+  heroBanner: { position:"relative", overflow:"hidden", background: "linear-gradient(135deg, rgba(232,160,191,0.12) 0%, rgba(198,122,158,0.08) 50%, rgba(232,160,191,0.05) 100%)", borderRadius:20, padding:"48px 28px 44px", textAlign:"center", margin:"20px 0 28px", border:"1px solid var(--border-accent)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" },
+  heroScript: { fontSize:38, fontWeight:700, margin:0, fontFamily: "'Dancing Script', cursive", color: "var(--accent-glow)", animation: "glowPulse 4s ease-in-out infinite", lineHeight: 1.1 },
+  heroTitle: { fontSize:14, fontWeight:400, margin:"12px 0 0", letterSpacing:3, textTransform:"uppercase", color:"var(--fg-muted)" },
+  heroLine: { width:60, height:1, margin:"16px auto 0", background:"linear-gradient(to right, transparent, var(--accent), transparent)" },
+  primaryAction: { width:"100%", padding:"20px 24px", background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)", color:"#fff", border:"none", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", gap:12, cursor:"pointer", fontSize:16, fontWeight:600, boxShadow: "var(--glow)", transition:"all 0.3s ease", letterSpacing:0.5 },
   infoCards: { display:"flex", flexDirection:"column", gap:12, marginTop:24 },
-  infoCard: {
-    display:"flex", gap:16, padding:"18px 20px",
-    background: "var(--bg-card)",
-    backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
-    borderRadius:16, border:"1px solid var(--glass-border)",
-    alignItems:"flex-start",
-    transition:"all 0.2s",
-  },
-  infoIcon: {
-    fontSize:18, marginTop:2,
-    width:36, height:36, borderRadius:10,
-    background:"var(--accent-wash-mid)",
-    display:"flex", alignItems:"center", justifyContent:"center",
-    flexShrink:0,
-  },
+  infoCard: { display:"flex", gap:16, padding:"18px 20px", background: "var(--bg-card)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", borderRadius:16, border:"1px solid var(--glass-border)", alignItems:"flex-start", transition:"all 0.2s" },
+  infoIcon: { fontSize:18, marginTop:2, width:36, height:36, borderRadius:10, background:"var(--accent-wash-mid)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 },
   infoTitle: { fontSize:13, fontWeight:600, margin:0, letterSpacing:0.3 },
   infoText: { fontSize:12, color:"var(--fg-muted)", margin:"4px 0 0", fontWeight:300, lineHeight:1.6 },
-  policyBox: {
-    marginTop:20, padding:"18px 20px",
-    background:"var(--policy-bg)", borderRadius:16,
-    border:"1px solid var(--policy-border)",
-  },
+  policyBox: { marginTop:20, padding:"18px 20px", background:"var(--policy-bg)", borderRadius:16, border:"1px solid var(--policy-border)" },
   policyTitle: { fontSize:13, fontWeight:600, margin:0, color:"var(--policy-title)" },
   policyText: { fontSize:12, color:"var(--fg-muted)", margin:"6px 0 0", fontWeight:300, lineHeight:1.6 },
-
-  /* ── Services ── */
-  sectionTitle: {
-    fontSize:22, fontWeight:600, margin:"24px 0 16px", letterSpacing:-0.5,
-    fontFamily: "'Dancing Script', cursive",
-    color: "var(--accent-glow)",
-  },
+  sectionTitle: { fontSize:22, fontWeight:600, margin:"24px 0 16px", letterSpacing:-0.5, fontFamily: "'Dancing Script', cursive", color: "var(--accent-glow)" },
   serviceList: { display:"flex", flexDirection:"column", gap:14 },
-  serviceCard: {
-    background:"var(--bg-card)",
-    backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
-    border:"1px solid var(--glass-border)",
-    borderRadius:18, padding:"20px 22px", cursor:"pointer", textAlign:"left", width:"100%",
-    transition:"all 0.3s ease",
-    position:"relative", overflow:"hidden",
-  },
+  serviceCard: { background:"var(--bg-card)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border:"1px solid var(--glass-border)", borderRadius:18, padding:"20px 22px", cursor:"pointer", textAlign:"left", width:"100%", transition:"all 0.3s ease", position:"relative", overflow:"hidden" },
   serviceTop: { display:"flex", justifyContent:"space-between", alignItems:"center" },
   serviceName: { fontSize:16, fontWeight:600, margin:0, letterSpacing:-0.2 },
-  servicePrice: {
-    fontSize:18, fontWeight:700,
-    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-glow) 100%)",
-    WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
-    backgroundClip:"text",
-  },
+  servicePrice: { fontSize:18, fontWeight:700, background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-glow) 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" },
   serviceDesc: { fontSize:12, color:"var(--fg-faint)", margin:"8px 0 12px", fontWeight:300, lineHeight:1.6 },
   serviceBottom: { display:"flex", justifyContent:"space-between", alignItems:"center" },
   serviceDuration: { fontSize:11, color:"var(--fg-ghost)", fontWeight:400, letterSpacing:0.5, textTransform:"uppercase" },
   serviceArrow: { color:"var(--accent)", fontSize:16, opacity:0.5, transition:"all 0.2s" },
-  serviceIcon: { fontSize:24, marginBottom:8 },
-  comingSoon: {
-    textAlign:"center", fontSize:13, color:"var(--fg-ghost)", marginTop:24,
-    padding:"16px", background:"var(--coming-bg)", borderRadius:14,
-    border:"1px dashed var(--coming-border)",
-    fontWeight:300, letterSpacing:0.5,
-  },
-
-  /* ── Booking flow ── */
-  selectedBanner: {
-    display:"flex", justifyContent:"space-between", alignItems:"center",
-    padding:"14px 18px", background:"var(--bg-card)",
-    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
-    borderRadius:14, border:"1px solid var(--glass-border)",
-    margin:"20px 0 8px", fontSize:14,
-  },
-  calendar: {
-    background:"var(--bg-card)",
-    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
-    borderRadius:18, padding:20,
-    border:"1px solid var(--glass-border)",
-  },
+  comingSoon: { textAlign:"center", fontSize:13, color:"var(--fg-ghost)", marginTop:24, padding:"16px", background:"var(--coming-bg)", borderRadius:14, border:"1px dashed var(--coming-border)", fontWeight:300, letterSpacing:0.5 },
+  selectedBanner: { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"14px 18px", background:"var(--bg-card)", backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)", borderRadius:14, border:"1px solid var(--glass-border)", margin:"20px 0 8px", fontSize:14 },
+  calendar: { background:"var(--bg-card)", backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)", borderRadius:18, padding:20, border:"1px solid var(--glass-border)" },
   calHeader: { display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 },
   calMonth: { fontSize:16, fontWeight:600, letterSpacing:-0.3 },
-  calNav: {
-    background:"none", border:"1px solid var(--border-accent)", fontSize:18,
-    cursor:"pointer", color:"var(--accent)", padding:"6px 14px", fontWeight:600,
-    borderRadius:10, transition:"all 0.2s",
-  },
+  calNav: { background:"none", border:"1px solid var(--border-accent)", fontSize:18, cursor:"pointer", color:"var(--accent)", padding:"6px 14px", fontWeight:600, borderRadius:10, transition:"all 0.2s" },
   calDays: { display:"grid", gridTemplateColumns:"repeat(7, 1fr)", gap:2 },
   calDayLabel: { fontSize:11, fontWeight:500, color:"var(--fg-ghost)", textAlign:"center", padding:"6px 0", letterSpacing:0.5 },
   calGrid: { display:"grid", gridTemplateColumns:"repeat(7, 1fr)", gap:4 },
-  calDay: {
-    width:"100%", aspectRatio:"1", border:"none", borderRadius:12,
-    fontSize:13, fontWeight:500, cursor:"pointer",
-    display:"flex", alignItems:"center", justifyContent:"center",
-    background:"transparent", color:"var(--fg)",
-    transition:"all 0.15s",
-  },
+  calDay: { width:"100%", aspectRatio:"1", border:"none", borderRadius:12, fontSize:13, fontWeight:500, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", color:"var(--fg)", transition:"all 0.15s" },
   calDayEmpty: { cursor:"default" },
   calDayDisabled: { color:"var(--disabled)", cursor:"not-allowed" },
   calDayAvailable: { background:"var(--accent-wash)" },
-  calDaySelected: {
-    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
-    color:"#fff", fontWeight:700,
-    boxShadow:"var(--glow-sm)",
-  },
+  calDaySelected: { background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)", color:"#fff", fontWeight:700, boxShadow:"var(--glow-sm)" },
   slotGrid: { display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:12 },
-  slotBtn: {
-    padding:"16px 8px", borderRadius:14,
-    border:"1px solid var(--glass-border)",
-    background:"var(--bg-card)",
-    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
-    fontSize:15, fontWeight:500, cursor:"pointer", textAlign:"center",
-    color:"var(--fg)", transition:"all 0.2s",
-  },
-  slotBtnSelected: {
-    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
-    color:"#fff", borderColor:"transparent",
-    boxShadow:"var(--glow-sm)",
-  },
+  slotBtn: { padding:"16px 8px", borderRadius:14, border:"1px solid var(--glass-border)", background:"var(--bg-card)", backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)", fontSize:15, fontWeight:500, cursor:"pointer", textAlign:"center", color:"var(--fg)", transition:"all 0.2s" },
+  slotBtnSelected: { background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)", color:"#fff", borderColor:"transparent", boxShadow:"var(--glow-sm)" },
   formGroup: { marginBottom:20 },
   label: { fontSize:12, fontWeight:500, display:"block", marginBottom:8, color:"var(--fg-muted)", letterSpacing:0.5, textTransform:"uppercase" },
-  input: {
-    width:"100%", padding:"14px 18px", borderRadius:14,
-    border:"1px solid var(--input-border)", fontSize:15,
-    outline:"none", boxSizing:"border-box", fontFamily:"inherit",
-    background:"var(--input-bg)", color:"var(--fg)",
-    transition:"border-color 0.2s",
-  },
-  summaryBox: {
-    background:"var(--accent-wash-mid)", borderRadius:18, padding:"20px 22px", margin:"24px 0",
-    border:"1px solid var(--border-accent)",
-  },
-  summaryTitle: {
-    fontSize:16, fontWeight:600, margin:"0 0 12px",
-    fontFamily:"'Dancing Script', cursive",
-    color:"var(--accent-glow)",
-  },
+  input: { width:"100%", padding:"14px 18px", borderRadius:14, border:"1px solid var(--input-border)", fontSize:15, outline:"none", boxSizing:"border-box", fontFamily:"inherit", background:"var(--input-bg)", color:"var(--fg)", transition:"border-color 0.2s" },
+  summaryBox: { background:"var(--accent-wash-mid)", borderRadius:18, padding:"20px 22px", margin:"24px 0", border:"1px solid var(--border-accent)" },
+  summaryTitle: { fontSize:16, fontWeight:600, margin:"0 0 12px", fontFamily:"'Dancing Script', cursive", color:"var(--accent-glow)" },
   summaryRow: { display:"flex", justifyContent:"space-between", fontSize:13, padding:"8px 0", borderBottom:"1px solid var(--border-accent)" },
   summaryLabel: { color:"var(--fg-faint)", fontWeight:300 },
-  confirmBtn: {
-    width:"100%", padding:18, borderRadius:16, border:"none",
-    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
-    color:"#fff", fontSize:16, fontWeight:600, cursor:"pointer",
-    boxShadow:"var(--glow)", transition:"all 0.3s",
-    letterSpacing:0.5,
-  },
-  confirmationCard: {
-    flex:1, display:"flex", flexDirection:"column", alignItems:"center",
-    justifyContent:"center", padding:"48px 28px",
-  },
+  confirmBtn: { width:"100%", padding:18, borderRadius:16, border:"none", background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)", color:"#fff", fontSize:16, fontWeight:600, cursor:"pointer", boxShadow:"var(--glow)", transition:"all 0.3s", letterSpacing:0.5 },
+  confirmationCard: { flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"48px 28px" },
   h2: { fontSize:22, fontWeight:600, margin:0, fontFamily:"'Dancing Script', cursive" },
   confirmText: { fontSize:14, color:"var(--fg-muted)", textAlign:"center", margin:"12px 0 24px", fontWeight:300, lineHeight:1.6 },
-  confirmDetail: {
-    width:"100%", background:"var(--bg-card)",
-    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
-    borderRadius:18, border:"1px solid var(--glass-border)", padding:"20px 22px",
-  },
+  confirmDetail: { width:"100%", background:"var(--bg-card)", backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)", borderRadius:18, border:"1px solid var(--glass-border)", padding:"20px 22px" },
   confirmRow: { display:"flex", justifyContent:"space-between", fontSize:13, padding:"10px 0", borderBottom:"1px solid var(--border)" },
   confirmLabel: { color:"var(--fg-faint)", fontWeight:300 },
-  whatsappBanner: {
-    display:"flex", alignItems:"center", gap:12,
-    background:"var(--whatsapp-bg)", borderRadius:14,
-    padding:"14px 18px", marginTop:20, width:"100%", boxSizing:"border-box",
-    border:"1px solid rgba(129,199,132,0.15)",
-  },
-  btnSecondary: {
-    marginTop:24, padding:"14px 36px", borderRadius:14,
-    border:"1px solid var(--border-accent)",
-    background:"transparent", fontSize:14, fontWeight:500, cursor:"pointer",
-    color:"var(--accent)", transition:"all 0.2s",
-    letterSpacing:0.3,
-  },
-  footer: {
-    padding:"28px 24px", textAlign:"center",
-    borderTop:"1px solid var(--border)",
-    background:"var(--glass)",
-    backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)",
-    marginTop:"auto",
-  },
+  whatsappBanner: { display:"flex", alignItems:"center", gap:12, background:"var(--whatsapp-bg)", borderRadius:14, padding:"14px 18px", marginTop:20, width:"100%", boxSizing:"border-box", border:"1px solid rgba(129,199,132,0.15)" },
+  btnSecondary: { marginTop:24, padding:"14px 36px", borderRadius:14, border:"1px solid var(--border-accent)", background:"transparent", fontSize:14, fontWeight:500, cursor:"pointer", color:"var(--accent)", transition:"all 0.2s", letterSpacing:0.3 },
+  footer: { padding:"28px 24px", textAlign:"center", borderTop:"1px solid var(--border)", background:"var(--glass)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", marginTop:"auto" },
   footerLink: { fontSize:12, color:"var(--accent)", cursor:"pointer", fontWeight:500, textDecoration:"none" },
 };
+
+
+/* ═══════════════════════════════════════
+   ADMIN STYLES
+   ═══════════════════════════════════════ */
+
+var a = {
+  wrap: { flex:1, padding:"0 24px 32px", position:"relative", zIndex:1 },
+  nav: {
+    display:"flex", gap:4, padding:"16px 24px 0", overflowX:"auto",
+    WebkitOverflowScrolling:"touch", msOverflowStyle:"none", scrollbarWidth:"none",
+  },
+  navBtn: {
+    padding:"10px 18px", borderRadius:12, border:"1px solid var(--glass-border)",
+    background:"var(--bg-card)", color:"var(--fg-muted)", fontSize:13, fontWeight:500,
+    cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s",
+    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
+  },
+  navBtnActive: {
+    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
+    color:"#fff", borderColor:"transparent", boxShadow:"var(--glow-sm)",
+  },
+  card: {
+    background:"var(--bg-card)", backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
+    borderRadius:18, padding:"24px", border:"1px solid var(--glass-border)", marginBottom:16,
+  },
+  cardTitle: { fontSize:16, fontWeight:600, margin:"0 0 16px", letterSpacing:-0.2 },
+  stat: {
+    textAlign:"center", padding:"20px 16px",
+    background:"var(--accent-wash)", borderRadius:14,
+    border:"1px solid var(--border-accent)",
+  },
+  statNum: { fontSize:28, fontWeight:700, color:"var(--accent-glow)", fontFamily:"'Dancing Script', cursive" },
+  statLabel: { fontSize:11, color:"var(--fg-faint)", textTransform:"uppercase", letterSpacing:0.5, marginTop:4, fontWeight:400 },
+  table: { width:"100%", borderCollapse:"collapse" },
+  th: { textAlign:"left", padding:"10px 12px", fontSize:11, fontWeight:500, color:"var(--fg-ghost)", textTransform:"uppercase", letterSpacing:0.5, borderBottom:"1px solid var(--border)" },
+  td: { padding:"12px", fontSize:14, borderBottom:"1px solid var(--border)", verticalAlign:"middle" },
+  btnSm: {
+    padding:"6px 14px", borderRadius:10, border:"1px solid var(--border-accent)",
+    background:"transparent", color:"var(--accent)", fontSize:12, fontWeight:500,
+    cursor:"pointer", transition:"all 0.2s", marginRight:6,
+  },
+  btnDanger: {
+    padding:"6px 14px", borderRadius:10, border:"1px solid var(--danger)",
+    background:"var(--danger-wash)", color:"var(--danger)", fontSize:12, fontWeight:500,
+    cursor:"pointer", transition:"all 0.2s",
+  },
+  btnPrimary: {
+    padding:"12px 24px", borderRadius:14, border:"none",
+    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
+    color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer",
+    boxShadow:"var(--glow-sm)", transition:"all 0.2s",
+  },
+  formRow: { display:"flex", gap:12, marginBottom:16, flexWrap:"wrap" },
+  formField: { flex:1, minWidth:140 },
+  inputSm: {
+    width:"100%", padding:"10px 14px", borderRadius:12,
+    border:"1px solid var(--input-border)", fontSize:14,
+    outline:"none", boxSizing:"border-box", fontFamily:"inherit",
+    background:"var(--input-bg)", color:"var(--fg)",
+  },
+  textarea: {
+    width:"100%", padding:"10px 14px", borderRadius:12,
+    border:"1px solid var(--input-border)", fontSize:14,
+    outline:"none", boxSizing:"border-box", fontFamily:"inherit",
+    background:"var(--input-bg)", color:"var(--fg)", minHeight:80, resize:"vertical",
+  },
+  dayToggle: {
+    display:"flex", alignItems:"center", justifyContent:"space-between",
+    padding:"12px 16px", borderRadius:12, border:"1px solid var(--glass-border)",
+    background:"var(--bg-card)", marginBottom:8,
+  },
+  toggle: {
+    width:44, height:24, borderRadius:12, cursor:"pointer", position:"relative",
+    transition:"all 0.2s", border:"none",
+  },
+  toggleDot: {
+    width:18, height:18, borderRadius:"50%", background:"#fff",
+    position:"absolute", top:3, transition:"all 0.2s",
+  },
+  badge: {
+    display:"inline-block", padding:"3px 10px", borderRadius:8, fontSize:11,
+    fontWeight:600, letterSpacing:0.3, textTransform:"uppercase",
+  },
+  bookingCard: {
+    padding:"16px 20px", borderRadius:14, border:"1px solid var(--glass-border)",
+    background:"var(--bg-card)", marginBottom:10,
+    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
+  },
+  calDayAdmin: {
+    width:"100%", aspectRatio:"1", border:"none", borderRadius:10,
+    fontSize:12, fontWeight:500, cursor:"pointer",
+    display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+    background:"transparent", color:"var(--fg)", transition:"all 0.15s",
+    gap:2, position:"relative",
+  },
+  calDot: {
+    width:5, height:5, borderRadius:"50%", background:"var(--accent)",
+  },
+  pinWrap: {
+    display:"flex", flexDirection:"column", alignItems:"center",
+    justifyContent:"center", minHeight:"60vh", padding:"48px 24px",
+  },
+  pinInput: {
+    width:200, padding:"16px", borderRadius:16, border:"2px solid var(--border-accent)",
+    fontSize:24, fontWeight:600, textAlign:"center", letterSpacing:8,
+    outline:"none", fontFamily:"inherit", background:"var(--input-bg)", color:"var(--fg)",
+    transition:"border-color 0.2s",
+  },
+};
+
+
+/* ═══════════════════════════════════════
+   DECORATIVE COMPONENTS
+   ═══════════════════════════════════════ */
+
+function Particles() {
+  var dots = [];
+  for (var i = 0; i < 20; i++) {
+    dots.push(e("div", {
+      key: i,
+      style: {
+        position: "absolute", width: Math.random() * 3 + 1, height: Math.random() * 3 + 1,
+        borderRadius: "50%", background: "var(--accent)",
+        opacity: Math.random() * 0.15 + 0.03,
+        left: Math.random() * 100 + "%", top: Math.random() * 100 + "%",
+        animation: "float " + (3 + Math.random() * 4) + "s ease-in-out infinite",
+        animationDelay: -Math.random() * 4 + "s",
+      }
+    }));
+  }
+  return e("div", { style: { position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }, "aria-hidden": "true" }, dots);
+}
+
+function Divider() {
+  return e("div", { style: { display: "flex", alignItems: "center", gap: 12, margin: "24px 0", padding: "0 20px" } },
+    e("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, var(--accent), transparent)", opacity: 0.3 } }),
+    e("div", { style: { color: "var(--accent)", fontSize: 10, opacity: 0.5 } }, "✦"),
+    e("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, var(--accent), transparent)", opacity: 0.3 } })
+  );
+}
 
 function Footer() {
   return e("footer", { style: s.footer },
     e("div", null,
-      e("p", {
-        style: {
-          fontSize:16, color:"var(--accent-glow)",
-          fontFamily:"'Dancing Script', cursive",
-          marginBottom:4,
-        }
-      }, "abigaillnails"),
+      e("p", { style: { fontSize:16, color:"var(--accent-glow)", fontFamily:"'Dancing Script', cursive", marginBottom:4 } }, "abigaillnails"),
       e("p", { style: { fontSize:11, color:"var(--fg-ghost)", letterSpacing:1, textTransform:"uppercase", fontWeight:300 } }, "Stokenchurch, Bucks"),
       e("div", { style: { display:"flex", gap:20, justifyContent:"center", margin:"12px 0" } },
         e("a", { href:"https://www.instagram.com/abigaillnails/", target:"_blank", rel:"noopener", style: s.footerLink }, "Instagram"),
@@ -477,35 +470,612 @@ function Footer() {
   );
 }
 
-function App() {
-  const [view, setView] = useState("home");
-  const [sel, setSel] = useState(null);
-  const [selDate, setSelDate] = useState(null);
-  const [selSlot, setSelSlot] = useState(null);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
-  const [cMonth, setCMonth] = useState(new Date().getMonth());
-  const [cYear, setCYear] = useState(new Date().getFullYear());
 
-  const today = new Date();
-  const days = genDays(cYear, cMonth);
+/* ═══════════════════════════════════════
+   ADMIN COMPONENTS
+   ═══════════════════════════════════════ */
 
-  const isAvail = (d) => {
+function AdminLogin(props) {
+  var pin = useState(""); var pinVal = pin[0]; var setPin = pin[1];
+  var err = useState(false); var hasErr = err[0]; var setErr = err[1];
+  var storedPin = loadData("pin", DEFAULT_PIN);
+
+  function tryLogin() {
+    if (pinVal === storedPin) { props.onLogin(); }
+    else { setErr(true); setPin(""); }
+  }
+
+  return e("div", { style: a.pinWrap },
+    e("div", { style: { fontSize:48, marginBottom:20 } }, "\u{1F512}"),
+    e("h2", { style: { ...s.h2, color:"var(--accent-glow)", marginBottom:8, fontSize:26 } }, "Admin Dashboard"),
+    e("p", { style: { fontSize:14, color:"var(--fg-muted)", marginBottom:28, fontWeight:300 } }, "Enter your PIN to continue"),
+    e("input", {
+      type:"password", maxLength:6, value:pinVal, style: a.pinInput,
+      placeholder:"••••",
+      onChange: function(ev) { setPin(ev.target.value); setErr(false); },
+      onKeyDown: function(ev) { if (ev.key === "Enter") tryLogin(); },
+    }),
+    hasErr && e("p", { style: { color:"var(--danger)", fontSize:13, marginTop:10 } }, "Incorrect PIN"),
+    e("button", { onClick: tryLogin, style: { ...a.btnPrimary, marginTop:20, width:200 } }, "Login"),
+    e("p", { style: { fontSize:11, color:"var(--fg-ghost)", marginTop:16 } }, "Default PIN: 1234")
+  );
+}
+
+function AdminDashboard(props) {
+  var bookings = props.bookings;
+  var services = props.services;
+  var today = new Date();
+  var todayStr = today.toISOString().split("T")[0];
+
+  var todayBookings = bookings.filter(function(b) { return b.date === todayStr; });
+  var pendingCount = bookings.filter(function(b) { return b.status === "pending"; }).length;
+  var thisWeek = bookings.filter(function(b) {
+    var d = new Date(b.date);
+    var diff = (d - today) / (1000 * 60 * 60 * 24);
+    return diff >= 0 && diff < 7;
+  });
+  var revenue = bookings.filter(function(b) { return b.status === "confirmed"; }).reduce(function(sum, b) {
+    var sv = services.find(function(x) { return x.id === b.serviceId; });
+    return sum + (sv ? sv.price : 0);
+  }, 0);
+
+  return e("div", null,
+    e("h2", { style: s.sectionTitle }, "Dashboard"),
+    e("div", { style: { display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:12, marginBottom:20 } },
+      e("div", { style: a.stat },
+        e("div", { style: a.statNum }, todayBookings.length),
+        e("div", { style: a.statLabel }, "Today's Bookings")
+      ),
+      e("div", { style: a.stat },
+        e("div", { style: a.statNum }, pendingCount),
+        e("div", { style: a.statLabel }, "Pending")
+      ),
+      e("div", { style: a.stat },
+        e("div", { style: a.statNum }, thisWeek.length),
+        e("div", { style: a.statLabel }, "This Week")
+      ),
+      e("div", { style: a.stat },
+        e("div", { style: a.statNum }, fmtPrice(revenue)),
+        e("div", { style: a.statLabel }, "Total Revenue")
+      )
+    ),
+    todayBookings.length > 0 && e("div", { style: a.card },
+      e("h3", { style: a.cardTitle }, "Today's Appointments"),
+      todayBookings.map(function(b, i) {
+        var sv = services.find(function(x) { return x.id === b.serviceId; });
+        return e("div", { key: i, style: a.bookingCard },
+          e("div", { style: { display:"flex", justifyContent:"space-between", alignItems:"center" } },
+            e("div", null,
+              e("div", { style: { fontWeight:600, fontSize:15 } }, b.name),
+              e("div", { style: { fontSize:13, color:"var(--fg-muted)", marginTop:2 } }, (sv ? sv.name : "Unknown") + " at " + b.time)
+            ),
+            e("span", { style: { ...a.badge, background: b.status === "confirmed" ? "rgba(129,199,132,0.15)" : "var(--accent-wash)", color: b.status === "confirmed" ? "var(--confirm-green)" : "var(--accent)" } }, b.status)
+          )
+        );
+      })
+    ),
+    todayBookings.length === 0 && e("div", { style: { ...a.card, textAlign:"center", padding:"40px 24px" } },
+      e("div", { style: { fontSize:36, marginBottom:12 } }, "✨"),
+      e("p", { style: { fontSize:15, color:"var(--fg-muted)", fontWeight:300 } }, "No appointments today — enjoy your day off!")
+    )
+  );
+}
+
+function AdminServices(props) {
+  var services = props.services;
+  var setServices = props.setServices;
+  var editing = useState(null); var editSv = editing[0]; var setEditSv = editing[1];
+  var adding = useState(false); var isAdding = adding[0]; var setIsAdding = adding[1];
+
+  var blank = { id: Date.now(), name: "", duration: "", durationMin: 60, price: 0, category: "nails", desc: "", icon: "\u{1F485}", active: true };
+
+  function saveSv(sv) {
+    sv.duration = fmtDuration(sv.durationMin);
+    var idx = services.findIndex(function(x) { return x.id === sv.id; });
+    var next;
+    if (idx >= 0) { next = services.slice(); next[idx] = sv; }
+    else { next = services.concat([sv]); }
+    setServices(next);
+    saveData("services", next);
+    setEditSv(null);
+    setIsAdding(false);
+  }
+
+  function deleteSv(id) {
+    var next = services.filter(function(x) { return x.id !== id; });
+    setServices(next);
+    saveData("services", next);
+  }
+
+  function toggleActive(id) {
+    var next = services.map(function(x) { return x.id === id ? Object.assign({}, x, { active: !x.active }) : x; });
+    setServices(next);
+    saveData("services", next);
+  }
+
+  if (editSv || isAdding) {
+    var sv = editSv || blank;
+    return e(ServiceEditor, { service: sv, onSave: saveSv, onCancel: function() { setEditSv(null); setIsAdding(false); } });
+  }
+
+  return e("div", null,
+    e("div", { style: { display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 } },
+      e("h2", { style: { ...s.sectionTitle, margin:0 } }, "Services"),
+      e("button", { onClick: function() { setIsAdding(true); }, style: a.btnPrimary }, "+ Add Service")
+    ),
+    services.map(function(sv) {
+      return e("div", { key: sv.id, style: { ...a.bookingCard, opacity: sv.active ? 1 : 0.5 } },
+        e("div", { style: { display:"flex", justifyContent:"space-between", alignItems:"center" } },
+          e("div", { style: { display:"flex", alignItems:"center", gap:12 } },
+            e("span", { style: { fontSize:24 } }, sv.icon),
+            e("div", null,
+              e("div", { style: { fontWeight:600, fontSize:15 } }, sv.name),
+              e("div", { style: { fontSize:12, color:"var(--fg-muted)" } }, sv.duration + " · " + fmtPrice(sv.price))
+            )
+          ),
+          e("div", { style: { display:"flex", gap:6, flexShrink:0 } },
+            e("button", { onClick: function() { toggleActive(sv.id); }, style: a.btnSm }, sv.active ? "Hide" : "Show"),
+            e("button", { onClick: function() { setEditSv(Object.assign({}, sv)); }, style: a.btnSm }, "Edit"),
+            e("button", { onClick: function() { if(confirm("Delete "+sv.name+"?")) deleteSv(sv.id); }, style: a.btnDanger }, "×")
+          )
+        )
+      );
+    })
+  );
+}
+
+function ServiceEditor(props) {
+  var sv = useState(props.service); var form = sv[0]; var setForm = sv[1];
+  function upd(k, v) { var n = Object.assign({}, form); n[k] = v; setForm(n); }
+
+  return e("div", { style: a.card },
+    e("h3", { style: a.cardTitle }, form.id && props.service.name ? "Edit Service" : "Add Service"),
+    e("div", { style: a.formRow },
+      e("div", { style: { ...a.formField, maxWidth:60 } },
+        e("label", { style: s.label }, "Icon"),
+        e("input", { value: form.icon, onChange: function(ev) { upd("icon", ev.target.value); }, style: { ...a.inputSm, fontSize:24, textAlign:"center", padding:"6px" } })
+      ),
+      e("div", { style: a.formField },
+        e("label", { style: s.label }, "Service Name"),
+        e("input", { value: form.name, onChange: function(ev) { upd("name", ev.target.value); }, style: a.inputSm, placeholder:"e.g. Gel Manicure" })
+      )
+    ),
+    e("div", { style: a.formRow },
+      e("div", { style: a.formField },
+        e("label", { style: s.label }, "Price (£)"),
+        e("input", { type:"number", value: form.price, onChange: function(ev) { upd("price", parseInt(ev.target.value) || 0); }, style: a.inputSm })
+      ),
+      e("div", { style: a.formField },
+        e("label", { style: s.label }, "Duration (mins)"),
+        e("input", { type:"number", value: form.durationMin, onChange: function(ev) { upd("durationMin", parseInt(ev.target.value) || 0); }, style: a.inputSm })
+      )
+    ),
+    e("div", { style: { marginBottom:16 } },
+      e("label", { style: s.label }, "Description"),
+      e("textarea", { value: form.desc, onChange: function(ev) { upd("desc", ev.target.value); }, style: a.textarea, placeholder:"Short description of the service" })
+    ),
+    e("div", { style: { display:"flex", gap:12 } },
+      e("button", { onClick: function() { if(form.name.trim()) props.onSave(form); }, style: a.btnPrimary }, "Save Service"),
+      e("button", { onClick: props.onCancel, style: a.btnSm }, "Cancel")
+    )
+  );
+}
+
+function AdminAvailability(props) {
+  var avail = props.availability;
+  var setAvail = props.setAvail;
+
+  function updAvail(key, val) {
+    var next = Object.assign({}, avail);
+    if (key === "days") next.days = val;
+    else next[key] = val;
+    setAvail(next);
+    saveData("availability", next);
+  }
+
+  function toggleDay(d) {
+    var days = Object.assign({}, avail.days);
+    days[d] = !days[d];
+    updAvail("days", days);
+  }
+
+  function addBlockedDate(dateStr) {
+    if (dateStr && avail.blockedDates.indexOf(dateStr) === -1) {
+      var next = Object.assign({}, avail, { blockedDates: avail.blockedDates.concat([dateStr]) });
+      setAvail(next);
+      saveData("availability", next);
+    }
+  }
+
+  function removeBlockedDate(dateStr) {
+    var next = Object.assign({}, avail, { blockedDates: avail.blockedDates.filter(function(d) { return d !== dateStr; }) });
+    setAvail(next);
+    saveData("availability", next);
+  }
+
+  var blockInput = useState(""); var blockVal = blockInput[0]; var setBlockVal = blockInput[1];
+
+  return e("div", null,
+    e("h2", { style: s.sectionTitle }, "Availability"),
+    e("div", { style: a.card },
+      e("h3", { style: a.cardTitle }, "Working Days"),
+      DAY_NAMES.map(function(name, i) {
+        var isOn = avail.days[i];
+        return e("div", { key: i, style: a.dayToggle },
+          e("span", { style: { fontWeight:500, fontSize:14 } }, name),
+          e("button", {
+            onClick: function() { toggleDay(i); },
+            style: { ...a.toggle, background: isOn ? "var(--accent)" : "var(--disabled)" }
+          },
+            e("div", { style: { ...a.toggleDot, left: isOn ? 23 : 3 } })
+          )
+        );
+      })
+    ),
+    e("div", { style: a.card },
+      e("h3", { style: a.cardTitle }, "Working Hours"),
+      e("div", { style: a.formRow },
+        e("div", { style: a.formField },
+          e("label", { style: s.label }, "Start Time"),
+          e("input", { type:"time", value: avail.startTime, onChange: function(ev) { updAvail("startTime", ev.target.value); }, style: a.inputSm })
+        ),
+        e("div", { style: a.formField },
+          e("label", { style: s.label }, "End Time"),
+          e("input", { type:"time", value: avail.endTime, onChange: function(ev) { updAvail("endTime", ev.target.value); }, style: a.inputSm })
+        ),
+        e("div", { style: a.formField },
+          e("label", { style: s.label }, "Slot Interval (mins)"),
+          e("input", { type:"number", value: avail.slotInterval, onChange: function(ev) { updAvail("slotInterval", parseInt(ev.target.value) || 30); }, style: a.inputSm })
+        )
+      ),
+      e("p", { style: { fontSize:12, color:"var(--fg-faint)", marginTop:8 } }, "Slots generated: " + generateSlots(avail.startTime, avail.endTime, avail.slotInterval).join(", "))
+    ),
+    e("div", { style: a.card },
+      e("h3", { style: a.cardTitle }, "Blocked Dates"),
+      e("p", { style: { fontSize:12, color:"var(--fg-muted)", marginBottom:12 } }, "Block off holidays, personal days, etc."),
+      e("div", { style: { display:"flex", gap:8, marginBottom:12 } },
+        e("input", { type:"date", value: blockVal, onChange: function(ev) { setBlockVal(ev.target.value); }, style: { ...a.inputSm, flex:1 } }),
+        e("button", { onClick: function() { addBlockedDate(blockVal); setBlockVal(""); }, style: a.btnPrimary }, "Block")
+      ),
+      avail.blockedDates.length === 0 && e("p", { style: { fontSize:13, color:"var(--fg-ghost)", fontStyle:"italic" } }, "No blocked dates"),
+      avail.blockedDates.sort().map(function(d) {
+        return e("div", { key: d, style: { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom:"1px solid var(--border)" } },
+          e("span", { style: { fontSize:14 } }, new Date(d + "T00:00:00").toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short", year:"numeric" })),
+          e("button", { onClick: function() { removeBlockedDate(d); }, style: a.btnDanger }, "Remove")
+        );
+      })
+    )
+  );
+}
+
+function AdminCalendar(props) {
+  var bookings = props.bookings;
+  var services = props.services;
+  var avail = props.availability;
+  var cm = useState(new Date().getMonth()); var cMonth = cm[0]; var setCMonth = cm[1];
+  var cy = useState(new Date().getFullYear()); var cYear = cy[0]; var setCYear = cy[1];
+  var sd = useState(null); var selDay = sd[0]; var setSelDay = sd[1];
+
+  var days = genDays(cYear, cMonth);
+  var prevMonth = function() { if (cMonth===0){setCMonth(11);setCYear(cYear-1)} else setCMonth(cMonth-1); setSelDay(null); };
+  var nextMonth = function() { if (cMonth===11){setCMonth(0);setCYear(cYear+1)} else setCMonth(cMonth+1); setSelDay(null); };
+
+  function bookingsOnDate(d) {
+    var dateStr = cYear + "-" + (cMonth+1 < 10 ? "0" : "") + (cMonth+1) + "-" + (d < 10 ? "0" : "") + d;
+    return bookings.filter(function(b) { return b.date === dateStr; });
+  }
+
+  var selectedBookings = selDay ? bookingsOnDate(selDay) : [];
+
+  return e("div", null,
+    e("h2", { style: s.sectionTitle }, "Calendar"),
+    e("div", { style: a.card },
+      e("div", { style: s.calHeader },
+        e("button", { onClick: prevMonth, style: s.calNav }, "‹"),
+        e("span", { style: s.calMonth }, MONTHS[cMonth] + " " + cYear),
+        e("button", { onClick: nextMonth, style: s.calNav }, "›")
+      ),
+      e("div", { style: s.calDays },
+        DAYS.map(function(d) { return e("div", { key: d, style: s.calDayLabel }, d); })
+      ),
+      e("div", { style: s.calGrid },
+        days.map(function(day, i) {
+          var bCount = day ? bookingsOnDate(day).length : 0;
+          var isBlocked = day ? avail.blockedDates.indexOf(cYear + "-" + (cMonth+1 < 10 ? "0" : "") + (cMonth+1) + "-" + (day < 10 ? "0" : "") + day) >= 0 : false;
+          return e("button", {
+            key: i,
+            onClick: function() { if (day) setSelDay(day); },
+            style: Object.assign({},
+              a.calDayAdmin,
+              day === null ? s.calDayEmpty : {},
+              selDay === day && day !== null ? s.calDaySelected : {},
+              isBlocked ? { background:"var(--danger-wash)" } : {}
+            )
+          },
+            day || "",
+            bCount > 0 && e("div", { style: { display:"flex", gap:2 } },
+              Array.from({ length: Math.min(bCount, 3) }).map(function(_, j) {
+                return e("div", { key: j, style: a.calDot });
+              })
+            )
+          );
+        })
+      )
+    ),
+    selDay && e("div", { style: { ...a.card, marginTop:16 } },
+      e("h3", { style: a.cardTitle }, new Date(cYear, cMonth, selDay).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long" })),
+      selectedBookings.length === 0 && e("p", { style: { fontSize:13, color:"var(--fg-ghost)", fontStyle:"italic" } }, "No bookings on this day"),
+      selectedBookings.map(function(b, i) {
+        var sv = services.find(function(x) { return x.id === b.serviceId; });
+        return e("div", { key: i, style: a.bookingCard },
+          e("div", { style: { display:"flex", justifyContent:"space-between", alignItems:"center" } },
+            e("div", null,
+              e("div", { style: { fontWeight:600 } }, b.name),
+              e("div", { style: { fontSize:13, color:"var(--fg-muted)" } }, (sv ? sv.name : "?") + " at " + b.time),
+              e("div", { style: { fontSize:12, color:"var(--fg-faint)" } }, b.phone)
+            ),
+            e("div", { style: { display:"flex", gap:6 } },
+              b.status === "pending" && e("button", { onClick: function() { props.updateBooking(b.id, "confirmed"); }, style: { ...a.btnSm, borderColor:"var(--confirm-green)", color:"var(--confirm-green)" } }, "✓"),
+              b.status !== "cancelled" && e("button", { onClick: function() { props.updateBooking(b.id, "cancelled"); }, style: a.btnDanger }, "×")
+            )
+          )
+        );
+      })
+    )
+  );
+}
+
+function AdminBookings(props) {
+  var bookings = props.bookings;
+  var services = props.services;
+  var filter = useState("all"); var filt = filter[0]; var setFilt = filter[1];
+
+  var filtered = filt === "all" ? bookings : bookings.filter(function(b) { return b.status === filt; });
+  filtered = filtered.slice().sort(function(x, y) { return x.date < y.date ? 1 : -1; });
+
+  return e("div", null,
+    e("h2", { style: s.sectionTitle }, "Bookings"),
+    e("div", { style: { display:"flex", gap:8, marginBottom:16 } },
+      ["all", "pending", "confirmed", "cancelled"].map(function(f) {
+        return e("button", {
+          key: f,
+          onClick: function() { setFilt(f); },
+          style: filt === f ? { ...a.navBtn, ...a.navBtnActive } : a.navBtn,
+        }, f.charAt(0).toUpperCase() + f.slice(1) + (f !== "all" ? " (" + bookings.filter(function(b) { return b.status === f; }).length + ")" : ""));
+      })
+    ),
+    filtered.length === 0 && e("div", { style: { ...a.card, textAlign:"center", padding:"40px" } },
+      e("p", { style: { fontSize:14, color:"var(--fg-ghost)" } }, "No " + (filt === "all" ? "" : filt + " ") + "bookings")
+    ),
+    filtered.map(function(b) {
+      var sv = services.find(function(x) { return x.id === b.serviceId; });
+      var statusColor = b.status === "confirmed" ? "var(--confirm-green)" : b.status === "cancelled" ? "var(--danger)" : "var(--accent)";
+      var statusBg = b.status === "confirmed" ? "rgba(129,199,132,0.12)" : b.status === "cancelled" ? "var(--danger-wash)" : "var(--accent-wash)";
+      return e("div", { key: b.id, style: a.bookingCard },
+        e("div", { style: { display:"flex", justifyContent:"space-between", alignItems:"flex-start" } },
+          e("div", null,
+            e("div", { style: { fontWeight:600, fontSize:15, marginBottom:4 } }, b.name),
+            e("div", { style: { fontSize:13, color:"var(--fg-muted)" } }, sv ? sv.name : "Unknown Service"),
+            e("div", { style: { fontSize:12, color:"var(--fg-faint)", marginTop:4 } },
+              new Date(b.date + "T00:00:00").toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short" }) + " at " + b.time
+            ),
+            e("div", { style: { fontSize:12, color:"var(--fg-faint)" } }, b.phone)
+          ),
+          e("div", { style: { display:"flex", flexDirection:"column", alignItems:"flex-end", gap:8 } },
+            e("span", { style: { ...a.badge, background: statusBg, color: statusColor } }, b.status),
+            e("div", { style: { display:"flex", gap:6 } },
+              b.status === "pending" && e("button", { onClick: function() { props.updateBooking(b.id, "confirmed"); }, style: { ...a.btnSm, borderColor:"var(--confirm-green)", color:"var(--confirm-green)" } }, "Confirm"),
+              b.status !== "cancelled" && e("button", { onClick: function() { props.updateBooking(b.id, "cancelled"); }, style: a.btnDanger }, "Cancel")
+            )
+          )
+        )
+      );
+    })
+  );
+}
+
+function AdminSettings(props) {
+  var settings = props.settings;
+  var setSettings = props.setSettings;
+  var pinState = useState(""); var newPin = pinState[0]; var setNewPin = pinState[1];
+  var pinMsg = useState(""); var pinMsgVal = pinMsg[0]; var setPinMsg = pinMsg[1];
+
+  function updSetting(k, v) {
+    var next = Object.assign({}, settings, {}); next[k] = v;
+    setSettings(next);
+    saveData("settings", next);
+  }
+
+  function changePin() {
+    if (newPin.length >= 4) {
+      saveData("pin", newPin);
+      setPinMsg("PIN updated!");
+      setNewPin("");
+      setTimeout(function() { setPinMsg(""); }, 3000);
+    }
+  }
+
+  return e("div", null,
+    e("h2", { style: s.sectionTitle }, "Settings"),
+    e("div", { style: a.card },
+      e("h3", { style: a.cardTitle }, "Business Details"),
+      e("div", { style: a.formRow },
+        e("div", { style: a.formField },
+          e("label", { style: s.label }, "Business Name"),
+          e("input", { value: settings.businessName, onChange: function(ev) { updSetting("businessName", ev.target.value); }, style: a.inputSm })
+        ),
+        e("div", { style: a.formField },
+          e("label", { style: s.label }, "Tagline"),
+          e("input", { value: settings.tagline, onChange: function(ev) { updSetting("tagline", ev.target.value); }, style: a.inputSm })
+        )
+      ),
+      e("div", { style: a.formRow },
+        e("div", { style: a.formField },
+          e("label", { style: s.label }, "Phone / WhatsApp"),
+          e("input", { value: settings.phone, onChange: function(ev) { updSetting("phone", ev.target.value); }, style: a.inputSm, placeholder:"07700 900123" })
+        ),
+        e("div", { style: a.formField },
+          e("label", { style: s.label }, "Instagram URL"),
+          e("input", { value: settings.instagram, onChange: function(ev) { updSetting("instagram", ev.target.value); }, style: a.inputSm })
+        )
+      )
+    ),
+    e("div", { style: a.card },
+      e("h3", { style: a.cardTitle }, "Cancellation Policy"),
+      e("div", { style: { marginBottom:12 } },
+        e("label", { style: s.label }, "Notice Period (hours)"),
+        e("input", { type:"number", value: settings.cancellationHours, onChange: function(ev) { updSetting("cancellationHours", parseInt(ev.target.value) || 24); }, style: { ...a.inputSm, maxWidth:100 } })
+      ),
+      e("div", null,
+        e("label", { style: s.label }, "Policy Text"),
+        e("textarea", { value: settings.cancellationPolicy, onChange: function(ev) { updSetting("cancellationPolicy", ev.target.value); }, style: a.textarea })
+      )
+    ),
+    e("div", { style: a.card },
+      e("h3", { style: a.cardTitle }, "Change Admin PIN"),
+      e("div", { style: { display:"flex", gap:8, alignItems:"flex-end" } },
+        e("div", { style: { flex:1 } },
+          e("label", { style: s.label }, "New PIN (min 4 digits)"),
+          e("input", { type:"password", value: newPin, maxLength:6, onChange: function(ev) { setNewPin(ev.target.value); }, style: a.inputSm, placeholder:"••••" })
+        ),
+        e("button", { onClick: changePin, style: a.btnPrimary }, "Update")
+      ),
+      pinMsgVal && e("p", { style: { color:"var(--confirm-green)", fontSize:13, marginTop:8 } }, pinMsgVal)
+    ),
+    e("div", { style: { ...a.card, background:"var(--danger-wash)", borderColor:"var(--danger)" } },
+      e("h3", { style: { ...a.cardTitle, color:"var(--danger)" } }, "Clear All Data"),
+      e("p", { style: { fontSize:13, color:"var(--fg-muted)", marginBottom:12 } }, "This will reset services, bookings, availability and settings to defaults."),
+      e("button", {
+        onClick: function() {
+          if (confirm("Are you sure? This will delete all your data.")) {
+            ["services","bookings","availability","settings","pin"].forEach(function(k) {
+              try { localStorage.removeItem("aby_" + k); } catch(ex) {}
+            });
+            window.location.reload();
+          }
+        },
+        style: a.btnDanger
+      }, "Reset Everything")
+    )
+  );
+}
+
+function AdminPanel(props) {
+  var tab = useState("dashboard"); var activeTab = tab[0]; var setTab = tab[1];
+  var services = useState(loadData("services", DEFAULT_SERVICES)); var svcs = services[0]; var setSvcs = services[1];
+  var bookings = useState(loadData("bookings", [])); var bkgs = bookings[0]; var setBkgs = bookings[1];
+  var avail = useState(loadData("availability", DEFAULT_AVAILABILITY)); var availability = avail[0]; var setAvail = avail[1];
+  var settings = useState(loadData("settings", DEFAULT_SETTINGS)); var sett = settings[0]; var setSettings = settings[1];
+
+  function updateBooking(id, status) {
+    var next = bkgs.map(function(b) { return b.id === id ? Object.assign({}, b, { status: status }) : b; });
+    setBkgs(next);
+    saveData("bookings", next);
+  }
+
+  var tabs = [
+    { id: "dashboard", label: "\u{1F4CA} Overview" },
+    { id: "calendar", label: "\u{1F4C5} Calendar" },
+    { id: "bookings", label: "\u{1F4CB} Bookings" },
+    { id: "services", label: "\u{1F48E} Services" },
+    { id: "availability", label: "⏰ Availability" },
+    { id: "settings", label: "⚙️ Settings" },
+  ];
+
+  return e("div", { style: { display:"flex", flexDirection:"column", minHeight:"100vh" } },
+    e(Particles),
+    e("header", { style: s.header },
+      e("div", { style: s.logoArea },
+        e("div", { style: s.logoCircle }, e("img", { src: LOGO_B64, alt:"Nail Studio by Abigail", style: s.logoImg })),
+        e("div", null,
+          e("h1", { style: s.brandName }, "Admin Dashboard"),
+          e("p", { style: s.tagline }, "abigaillnails")
+        )
+      ),
+      e("button", { onClick: props.onLogout, style: s.backBtn }, "Logout")
+    ),
+    e("div", { style: a.nav },
+      tabs.map(function(t) {
+        return e("button", {
+          key: t.id,
+          onClick: function() { setTab(t.id); },
+          style: activeTab === t.id ? { ...a.navBtn, ...a.navBtnActive } : a.navBtn,
+        }, t.label);
+      })
+    ),
+    e("div", { style: a.wrap },
+      activeTab === "dashboard" && e(AdminDashboard, { bookings: bkgs, services: svcs }),
+      activeTab === "calendar" && e(AdminCalendar, { bookings: bkgs, services: svcs, availability: availability, updateBooking: updateBooking }),
+      activeTab === "bookings" && e(AdminBookings, { bookings: bkgs, services: svcs, updateBooking: updateBooking }),
+      activeTab === "services" && e(AdminServices, { services: svcs, setServices: setSvcs }),
+      activeTab === "availability" && e(AdminAvailability, { availability: availability, setAvail: setAvail }),
+      activeTab === "settings" && e(AdminSettings, { settings: sett, setSettings: setSettings })
+    ),
+    e("footer", { style: { ...s.footer } },
+      e("p", { style: { fontSize:10, color:"var(--fg-ghost)", fontWeight:300 } }, "Admin Dashboard · Built by Symplify Solutions")
+    )
+  );
+}
+
+
+/* ═══════════════════════════════════════
+   CUSTOMER APP
+   ═══════════════════════════════════════ */
+
+function CustomerApp() {
+  var services = loadData("services", DEFAULT_SERVICES).filter(function(sv) { return sv.active; });
+  var availability = loadData("availability", DEFAULT_AVAILABILITY);
+  var settings = loadData("settings", DEFAULT_SETTINGS);
+  var slots = generateSlots(availability.startTime, availability.endTime, availability.slotInterval);
+
+  var viewState = useState("home"); var view = viewState[0]; var setView = viewState[1];
+  var selState = useState(null); var sel = selState[0]; var setSel = selState[1];
+  var dateState = useState(null); var selDate = dateState[0]; var setSelDate = dateState[1];
+  var slotState = useState(null); var selSlot = slotState[0]; var setSelSlot = slotState[1];
+  var nameState = useState(""); var name = nameState[0]; var setName = nameState[1];
+  var phoneState = useState(""); var phone = phoneState[0]; var setPhone = phoneState[1];
+  var confState = useState(false); var confirmed = confState[0]; var setConfirmed = confState[1];
+  var cmState = useState(new Date().getMonth()); var cMonth = cmState[0]; var setCMonth = cmState[1];
+  var cyState = useState(new Date().getFullYear()); var cYear = cyState[0]; var setCYear = cyState[1];
+
+  var today = new Date();
+  var days = genDays(cYear, cMonth);
+
+  function isAvail(d) {
     if (!d) return false;
-    const dt = new Date(cYear, cMonth, d);
-    const dow = dt.getDay();
-    if (dow === 0 || dow === 6) return false;
+    var dt = new Date(cYear, cMonth, d);
+    var dow = dt.getDay();
+    if (!availability.days[dow]) return false;
     if (dt < new Date(today.getFullYear(), today.getMonth(), today.getDate())) return false;
+    var dateStr = cYear + "-" + (cMonth+1 < 10 ? "0" : "") + (cMonth+1) + "-" + (d < 10 ? "0" : "") + d;
+    if (availability.blockedDates.indexOf(dateStr) >= 0) return false;
     return true;
-  };
+  }
 
-  const handleConfirm = () => { if (name.trim() && phone.trim()) setConfirmed(true); };
-  const resetAll = () => { setView("home"); setSel(null); setSelDate(null); setSelSlot(null); setName(""); setPhone(""); setConfirmed(false); };
-  const prevMonth = () => { if (cMonth===0){setCMonth(11);setCYear(cYear-1)} else setCMonth(cMonth-1) };
-  const nextMonth = () => { if (cMonth===11){setCMonth(0);setCYear(cYear+1)} else setCMonth(cMonth+1) };
+  function handleConfirm() {
+    if (name.trim() && phone.trim()) {
+      var dateStr = cYear + "-" + (cMonth+1 < 10 ? "0" : "") + (cMonth+1) + "-" + (selDate < 10 ? "0" : "") + selDate;
+      var booking = {
+        id: Date.now(),
+        serviceId: sel.id,
+        date: dateStr,
+        time: selSlot,
+        name: name.trim(),
+        phone: phone.trim(),
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+      var existing = loadData("bookings", []);
+      existing.push(booking);
+      saveData("bookings", existing);
+      setConfirmed(true);
+    }
+  }
 
-  const goBack = () => {
+  var resetAll = function() { setView("home"); setSel(null); setSelDate(null); setSelSlot(null); setName(""); setPhone(""); setConfirmed(false); };
+  var prevMonth = function() { if (cMonth===0){setCMonth(11);setCYear(cYear-1)} else setCMonth(cMonth-1); };
+  var nextMonth = function() { if (cMonth===11){setCMonth(0);setCYear(cYear+1)} else setCMonth(cMonth+1); };
+  var goBack = function() {
     if (view==="book-slot") setView("book-date");
     else if (view==="book-date") setView("services");
     else if (view==="book-details") setView("book-slot");
@@ -513,13 +1083,13 @@ function App() {
   };
 
   if (confirmed) {
-    const dateStr = new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long" });
-    return e("div", { id: "app-root", style: { display:"flex", flexDirection:"column", minHeight:"100vh" } },
+    var dateStr = new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long" });
+    return e("div", { style: { display:"flex", flexDirection:"column", minHeight:"100vh" } },
       e(Particles),
       e("div", { style: s.confirmationCard, className:"fade-up" },
         e("div", { style: { fontSize:48, marginBottom:20, animation:"float 3s ease-in-out infinite" } }, "✨"),
         e("h2", { style: { ...s.h2, color:"var(--confirm-green)", marginBottom:8, fontSize:26 } }, "You're Booked!"),
-        e("p", { style: s.confirmText }, "Thank you, " + name + ". Your appointment is confirmed."),
+        e("p", { style: s.confirmText }, "Thank you, " + name + ". Your appointment request has been sent."),
         e("div", { style: s.confirmDetail },
           e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Service"), e("span", { style:{fontWeight:500} }, sel.name)),
           e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Date"), e("span", { style:{fontWeight:500} }, dateStr)),
@@ -527,8 +1097,8 @@ function App() {
           e("div", { style: {...s.confirmRow, borderBottom:"none"} }, e("span", { style: s.confirmLabel }, "Duration"), e("span", { style:{fontWeight:500} }, sel.duration))
         ),
         e("div", { style: s.whatsappBanner },
-          e("span", { style: { fontSize:20 } }, "💬"),
-          e("span", { style: { fontSize:13, fontWeight:300, lineHeight:1.5 } }, "A WhatsApp confirmation will be sent to " + phone)
+          e("span", { style: { fontSize:20 } }, "\u{1F4AC}"),
+          e("span", { style: { fontSize:13, fontWeight:300, lineHeight:1.5 } }, "Abigail will confirm your booking shortly via WhatsApp")
         ),
         e("p", { style: { fontSize:12, color:"var(--fg-faint)", marginTop:16, textAlign:"center", fontWeight:300 } }, "You'll receive a reminder 24 hours before"),
         e("button", { onClick: resetAll, style: s.btnSecondary }, "Back to Home")
@@ -537,22 +1107,20 @@ function App() {
     );
   }
 
-  return e("div", { id: "app-root", style: { display:"flex", flexDirection:"column", minHeight:"100vh" } },
+  return e("div", { style: { display:"flex", flexDirection:"column", minHeight:"100vh" } },
     e(Particles),
 
-    // Header
     e("header", { style: s.header },
       e("div", { style: s.logoArea },
-        e("div", { style: s.logoCircle }, e("img", { src:"data:image/jpeg;base64,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", alt:"Nail Studio by Abigail", style:s.logoImg })),
+        e("div", { style: s.logoCircle }, e("img", { src: LOGO_B64, alt:"Nail Studio by Abigail", style: s.logoImg })),
         e("div", null,
-          e("h1", { style: s.brandName }, "abigaillnails"),
-          e("p", { style: s.tagline }, "Stokenchurch")
+          e("h1", { style: s.brandName }, settings.businessName || "abigaillnails"),
+          e("p", { style: s.tagline }, settings.tagline || "Stokenchurch")
         )
       ),
       view !== "home" && e("button", { onClick: goBack, style: s.backBtn }, "← Back")
     ),
 
-    // HOME
     view === "home" && e("div", { style: s.content },
       e("div", { style: s.heroBanner, className:"fade-up" },
         e("h2", { style: s.heroScript }, "nails by Abigail"),
@@ -560,17 +1128,15 @@ function App() {
         e("div", { style: s.heroLine })
       ),
       e("div", { style: { marginBottom:8 }, className:"fade-up fade-up-1" },
-        e("button", { onClick: () => setView("services"), style: s.primaryAction },
+        e("button", { onClick: function() { setView("services"); }, style: s.primaryAction },
           e("span", { style: { fontSize:16 } }, "Book Your Appointment"),
           e("span", { style: { fontSize:20 } }, "→")
         )
       ),
-
       e(Divider),
-
       e("div", { style: s.infoCards },
         e("div", { style: s.infoCard, className:"fade-up fade-up-2" },
-          e("div", { style: s.infoIcon }, "📍"),
+          e("div", { style: s.infoIcon }, "\u{1F4CD}"),
           e("div", null,
             e("p", { style: s.infoTitle }, "Location"),
             e("p", { style: s.infoText }, "Home-based in Stokenchurch, Buckinghamshire. Address shared upon booking.")
@@ -580,11 +1146,15 @@ function App() {
           e("div", { style: s.infoIcon }, "⏰"),
           e("div", null,
             e("p", { style: s.infoTitle }, "Opening Hours"),
-            e("p", { style: s.infoText }, "Mon–Fri, 9:00–18:00. Appointments only.")
+            e("p", { style: s.infoText }, (function() {
+              var openDays = [];
+              for (var i = 0; i < 7; i++) { if (availability.days[i]) openDays.push(DAYS[i]); }
+              return openDays.join(", ") + ", " + availability.startTime + "–" + availability.endTime + ". Appointments only.";
+            })())
           )
         ),
         e("div", { style: s.infoCard, className:"fade-up fade-up-4" },
-          e("div", { style: s.infoIcon }, "💬"),
+          e("div", { style: s.infoIcon }, "\u{1F4AC}"),
           e("div", null,
             e("p", { style: s.infoTitle }, "Get in Touch"),
             e("p", { style: s.infoText }, "WhatsApp for enquiries, changes, or cancellations.")
@@ -593,15 +1163,14 @@ function App() {
       ),
       e("div", { style: s.policyBox, className:"fade-up fade-up-5" },
         e("p", { style: s.policyTitle }, "Booking Policy"),
-        e("p", { style: s.policyText }, "Please provide at least 24 hours’ notice for cancellations or changes. Late cancellations or no-shows may affect future booking availability.")
+        e("p", { style: s.policyText }, settings.cancellationPolicy)
       )
     ),
 
-    // SERVICES
     view === "services" && e("div", { style: s.content },
       e("h2", { style: s.sectionTitle }, "Choose a Service"),
       e("div", { style: s.serviceList },
-        SERVICES.map(function(sv, idx) {
+        services.map(function(sv, idx) {
           return e("button", {
             key: sv.id,
             onClick: function() { setSel(sv); setView("book-date"); },
@@ -611,7 +1180,7 @@ function App() {
             e("div", { style: { fontSize:28, marginBottom:8 } }, sv.icon),
             e("div", { style: s.serviceTop },
               e("h3", { style: s.serviceName }, sv.name),
-              e("span", { style: s.servicePrice }, sv.price)
+              e("span", { style: s.servicePrice }, fmtPrice(sv.price))
             ),
             e("p", { style: s.serviceDesc }, sv.desc),
             e("div", { style: s.serviceBottom },
@@ -621,14 +1190,13 @@ function App() {
           );
         })
       ),
-      e("p", { style: s.comingSoon, className:"fade-up fade-up-5" }, "🧖‍♀️ Facials — Coming Soon")
+      e("p", { style: s.comingSoon, className:"fade-up fade-up-5" }, "\u{1F9D6}‍♀️ Facials — Coming Soon")
     ),
 
-    // DATE PICKER
     view === "book-date" && sel && e("div", { style: s.content },
       e("div", { style: s.selectedBanner, className:"fade-up" },
         e("span", { style: { fontWeight:600 } }, sel.name),
-        e("span", { style: { color:"var(--accent)" } }, sel.price + " · " + sel.duration)
+        e("span", { style: { color:"var(--accent)" } }, fmtPrice(sel.price) + " · " + sel.duration)
       ),
       e("h2", { style: s.sectionTitle }, "Pick a Date"),
       e("div", { style: s.calendar, className:"fade-up fade-up-1" },
@@ -659,7 +1227,6 @@ function App() {
       )
     ),
 
-    // TIME SLOTS
     view === "book-slot" && sel && selDate && e("div", { style: s.content },
       e("div", { style: s.selectedBanner, className:"fade-up" },
         e("span", { style: { fontWeight:600 } }, sel.name),
@@ -667,7 +1234,7 @@ function App() {
       ),
       e("h2", { style: s.sectionTitle }, "Choose a Time"),
       e("div", { style: s.slotGrid },
-        SLOTS.map(function(slot, idx) {
+        slots.map(function(slot, idx) {
           return e("button", {
             key: slot,
             onClick: function() { setSelSlot(slot); setView("book-details"); },
@@ -675,11 +1242,9 @@ function App() {
             className: "fade-up fade-up-" + (idx < 5 ? idx + 1 : 5)
           }, slot);
         })
-      ),
-      e("p", { style: { fontSize:11, color:"var(--fg-faint)", textAlign:"center", marginTop:16, fontWeight:300, letterSpacing:0.3 } }, "Slots shown are examples — live availability will sync with Abigail’s calendar")
+      )
     ),
 
-    // DETAILS FORM
     view === "book-details" && sel && selDate && selSlot && e("div", { style: s.content },
       e("div", { style: s.selectedBanner, className:"fade-up" },
         e("span", { style: { fontWeight:600 } }, sel.name),
@@ -688,11 +1253,11 @@ function App() {
       e("h2", { style: s.sectionTitle }, "Your Details"),
       e("div", { style: s.formGroup, className:"fade-up fade-up-1" },
         e("label", { style: s.label }, "Full Name"),
-        e("input", { id: "name-input", type:"text", value: name, onChange: function(ev) { setName(ev.target.value); }, placeholder:"e.g. Sarah Jones", style: s.input })
+        e("input", { type:"text", value: name, onChange: function(ev) { setName(ev.target.value); }, placeholder:"e.g. Sarah Jones", style: s.input })
       ),
       e("div", { style: s.formGroup, className:"fade-up fade-up-2" },
         e("label", { style: s.label }, "Phone Number"),
-        e("input", { id: "phone-input", type:"tel", value: phone, onChange: function(ev) { setPhone(ev.target.value); }, placeholder:"e.g. 07700 900123", style: s.input })
+        e("input", { type:"tel", value: phone, onChange: function(ev) { setPhone(ev.target.value); }, placeholder:"e.g. 07700 900123", style: s.input })
       ),
       e("div", { style: s.summaryBox, className:"fade-up fade-up-3" },
         e("p", { style: s.summaryTitle }, "Booking Summary"),
@@ -700,7 +1265,7 @@ function App() {
         e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Date"), e("span", { style:{fontWeight:500} }, new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long" }))),
         e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Time"), e("span", { style:{fontWeight:500} }, selSlot)),
         e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Duration"), e("span", { style:{fontWeight:500} }, sel.duration)),
-        e("div", { style: { ...s.summaryRow, borderBottom:"none", fontWeight:700, fontSize:15 } }, e("span", null, "Total"), e("span", { style:{color:"var(--accent)"} }, sel.price))
+        e("div", { style: { ...s.summaryRow, borderBottom:"none", fontWeight:700, fontSize:15 } }, e("span", null, "Total"), e("span", { style:{color:"var(--accent)"} }, fmtPrice(sel.price)))
       ),
       e("button", {
         onClick: handleConfirm,
@@ -713,6 +1278,49 @@ function App() {
 
     e(Footer)
   );
+}
+
+
+/* ═══════════════════════════════════════
+   MAIN APP (ROUTER)
+   ═══════════════════════════════════════ */
+
+function App() {
+  var mode = useState(window.location.hash === "#admin" ? "admin" : "customer");
+  var appMode = mode[0]; var setAppMode = mode[1];
+  var auth = useState(false); var isAuth = auth[0]; var setIsAuth = auth[1];
+
+  useEffect(function() {
+    function onHash() {
+      if (window.location.hash === "#admin") {
+        setAppMode("admin");
+        document.getElementById("root").classList.add("admin-mode");
+      } else {
+        setAppMode("customer");
+        setIsAuth(false);
+        document.getElementById("root").classList.remove("admin-mode");
+      }
+    }
+    window.addEventListener("hashchange", onHash);
+    if (window.location.hash === "#admin") document.getElementById("root").classList.add("admin-mode");
+    return function() { window.removeEventListener("hashchange", onHash); };
+  }, []);
+
+  if (appMode === "admin") {
+    if (!isAuth) {
+      return e(AdminLogin, { onLogin: function() { setIsAuth(true); } });
+    }
+    return e(AdminPanel, {
+      onLogout: function() {
+        setIsAuth(false);
+        window.location.hash = "";
+        setAppMode("customer");
+        document.getElementById("root").classList.remove("admin-mode");
+      }
+    });
+  }
+
+  return e(CustomerApp);
 }
 
 ReactDOM.render(e(App), document.getElementById("root"));
