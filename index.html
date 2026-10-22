@@ -5,99 +5,147 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>abigaillnails | Book Your Appointment</title>
 <meta name="description" content="Home-based nail care in the heart of the Chilterns. Book BIAB manicures, gel pedicures and more with Abigail in Stokenchurch, Buckinghamshire.">
-<meta name="theme-color" content="#E8A0BF">
+<meta name="theme-color" content="#1a1018">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💅</text></svg>">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap">
 <style>
-/* Layout: single-column mobile-first booking flow, 420px max */
 :root {
-  --bg: #FAFAFA;
-  --bg-card: #fff;
-  --fg: #1a1a1a;
-  --fg-muted: #777;
-  --fg-faint: #999;
-  --fg-ghost: #bbb;
+  --bg: #0f0a10;
+  --bg-card: rgba(40, 28, 38, 0.6);
+  --bg-card-solid: #281c26;
+  --fg: #f5ede8;
+  --fg-muted: #b8a8b2;
+  --fg-faint: #887880;
+  --fg-ghost: #5a4e56;
   --accent: #E8A0BF;
-  --accent-deep: #d4789e;
-  --accent-wash: #fdf2f7;
-  --accent-wash-mid: #fce8f0;
-  --border: #f0f0f0;
-  --border-accent: #f0e0ea;
-  --input-border: #e0e0e0;
+  --accent-glow: #f0b8d0;
+  --accent-deep: #c67a9e;
+  --accent-wash: rgba(232, 160, 191, 0.08);
+  --accent-wash-mid: rgba(232, 160, 191, 0.14);
+  --border: rgba(232, 160, 191, 0.1);
+  --border-accent: rgba(232, 160, 191, 0.2);
+  --input-border: rgba(232, 160, 191, 0.15);
+  --input-bg: rgba(30, 20, 28, 0.8);
+  --policy-bg: rgba(255, 248, 225, 0.06);
+  --policy-border: rgba(255, 224, 130, 0.15);
+  --policy-title: #FFD54F;
+  --confirm-green: #81C784;
+  --whatsapp-bg: rgba(129, 199, 132, 0.08);
+  --disabled: #3a2e36;
+  --coming-bg: rgba(255, 255, 255, 0.03);
+  --coming-border: rgba(232, 160, 191, 0.12);
+  --glass: rgba(40, 28, 38, 0.5);
+  --glass-border: rgba(232, 160, 191, 0.12);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glow: 0 0 20px rgba(232, 160, 191, 0.3), 0 0 60px rgba(232, 160, 191, 0.1);
+  --glow-sm: 0 0 10px rgba(232, 160, 191, 0.2);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #fdf6f9;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-card-solid: #ffffff;
+    --fg: #1a1018;
+    --fg-muted: #6e5a66;
+    --fg-faint: #9a8690;
+    --fg-ghost: #c0b0b8;
+    --accent: #d4789e;
+    --accent-glow: #E8A0BF;
+    --accent-deep: #b85a82;
+    --accent-wash: rgba(232, 160, 191, 0.08);
+    --accent-wash-mid: rgba(232, 160, 191, 0.12);
+    --border: rgba(26, 16, 24, 0.08);
+    --border-accent: rgba(212, 120, 158, 0.2);
+    --input-border: rgba(26, 16, 24, 0.12);
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --policy-bg: #FFF8E1;
+    --policy-border: #FFE082;
+    --policy-title: #F57F17;
+    --confirm-green: #2E7D32;
+    --whatsapp-bg: #E8F5E9;
+    --disabled: #e0d4da;
+    --coming-bg: rgba(0, 0, 0, 0.02);
+    --coming-border: rgba(26, 16, 24, 0.08);
+    --glass: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(212, 120, 158, 0.15);
+    --shadow: 0 8px 32px rgba(26, 16, 24, 0.08);
+    --glow: 0 0 20px rgba(212, 120, 158, 0.15), 0 0 60px rgba(212, 120, 158, 0.05);
+    --glow-sm: 0 0 10px rgba(212, 120, 158, 0.1);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #fdf6f9;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-solid: #ffffff;
+  --fg: #1a1018;
+  --fg-muted: #6e5a66;
+  --fg-faint: #9a8690;
+  --fg-ghost: #c0b0b8;
+  --accent: #d4789e;
+  --accent-glow: #E8A0BF;
+  --accent-deep: #b85a82;
+  --accent-wash: rgba(232, 160, 191, 0.08);
+  --accent-wash-mid: rgba(232, 160, 191, 0.12);
+  --border: rgba(26, 16, 24, 0.08);
+  --border-accent: rgba(212, 120, 158, 0.2);
+  --input-border: rgba(26, 16, 24, 0.12);
+  --input-bg: rgba(255, 255, 255, 0.9);
   --policy-bg: #FFF8E1;
   --policy-border: #FFE082;
   --policy-title: #F57F17;
   --confirm-green: #2E7D32;
   --whatsapp-bg: #E8F5E9;
-  --disabled: #ddd;
-  --coming-bg: #f9f9f9;
-  --coming-border: #e0e0e0;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #161618;
-    --bg-card: #1e1e22;
-    --fg: #e8e8ec;
-    --fg-muted: #a0a0a8;
-    --fg-faint: #787880;
-    --fg-ghost: #555;
-    --accent: #E8A0BF;
-    --accent-deep: #d4789e;
-    --accent-wash: #2a1e24;
-    --accent-wash-mid: #2e1f28;
-    --border: #2a2a2e;
-    --border-accent: #3a2a32;
-    --input-border: #3a3a3e;
-    --policy-bg: #2a2618;
-    --policy-border: #5a4e2a;
-    --policy-title: #FFB74D;
-    --confirm-green: #66BB6A;
-    --whatsapp-bg: #1e2e1e;
-    --disabled: #444;
-    --coming-bg: #1e1e22;
-    --coming-border: #333;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #161618;
-  --bg-card: #1e1e22;
-  --fg: #e8e8ec;
-  --fg-muted: #a0a0a8;
-  --fg-faint: #787880;
-  --fg-ghost: #555;
-  --accent: #E8A0BF;
-  --accent-deep: #d4789e;
-  --accent-wash: #2a1e24;
-  --accent-wash-mid: #2e1f28;
-  --border: #2a2a2e;
-  --border-accent: #3a2a32;
-  --input-border: #3a3a3e;
-  --policy-bg: #2a2618;
-  --policy-border: #5a4e2a;
-  --policy-title: #FFB74D;
-  --confirm-green: #66BB6A;
-  --whatsapp-bg: #1e2e1e;
-  --disabled: #444;
-  --coming-bg: #1e1e22;
-  --coming-border: #333;
-  color-scheme: dark;
+  --disabled: #e0d4da;
+  --coming-bg: rgba(0, 0, 0, 0.02);
+  --coming-border: rgba(26, 16, 24, 0.08);
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(212, 120, 158, 0.15);
+  --shadow: 0 8px 32px rgba(26, 16, 24, 0.08);
+  --glow: 0 0 20px rgba(212, 120, 158, 0.15), 0 0 60px rgba(212, 120, 158, 0.05);
+  --glow-sm: 0 0 10px rgba(212, 120, 158, 0.1);
+  color-scheme: light;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 #root {
-  max-width: 420px;
+  max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes glowPulse {
+  0%, 100% { text-shadow: 0 0 20px rgba(232,160,191,0.4), 0 0 40px rgba(232,160,191,0.2), 0 0 80px rgba(232,160,191,0.1); }
+  50% { text-shadow: 0 0 30px rgba(232,160,191,0.6), 0 0 60px rgba(232,160,191,0.3), 0 0 100px rgba(232,160,191,0.15); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.fade-up { animation: fadeUp 0.5s ease both; }
+.fade-up-1 { animation-delay: 0.1s; }
+.fade-up-2 { animation-delay: 0.2s; }
+.fade-up-3 { animation-delay: 0.3s; }
+.fade-up-4 { animation-delay: 0.4s; }
+.fade-up-5 { animation-delay: 0.5s; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
@@ -109,10 +157,10 @@ const e = React.createElement;
 const { useState } = React;
 
 const SERVICES = [
-  { id: 1, name: "BIAB Manicure", duration: "1 hr 15 min", price: "£42", category: "nails", desc: "Builder gel manicure for natural nail strength and a flawless finish" },
-  { id: 2, name: "BIAB Manicure with Art", duration: "1 hr 30 min", price: "£48", category: "nails", desc: "Builder gel manicure with bespoke nail art designs" },
-  { id: 3, name: "Gel Toe Paint", duration: "45 min", price: "£40", category: "nails", desc: "Gel polish application for perfectly polished toes" },
-  { id: 4, name: "Gel Pedicure", duration: "1 hr", price: "£48", category: "nails", desc: "Full gel pedicure with foot care and polish" },
+  { id: 1, name: "BIAB Manicure", duration: "1 hr 15 min", price: "£42", category: "nails", desc: "Builder gel manicure for natural nail strength and a flawless finish", icon: "💅" },
+  { id: 2, name: "BIAB Manicure with Art", duration: "1 hr 30 min", price: "£48", category: "nails", desc: "Builder gel manicure with bespoke nail art designs", icon: "✨" },
+  { id: 3, name: "Gel Toe Paint", duration: "45 min", price: "£40", category: "nails", desc: "Gel polish application for perfectly polished toes", icon: "🦶" },
+  { id: 4, name: "Gel Pedicure", duration: "1 hr", price: "£48", category: "nails", desc: "Full gel pedicure with foot care and polish", icon: "🌸" },
 ];
 
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -121,81 +169,310 @@ const SLOTS = ["09:00","10:30","12:00","13:30","15:00","16:30"];
 
 function genDays(y,m){ const f=new Date(y,m,1).getDay(), n=new Date(y,m+1,0).getDate(), d=[]; for(let i=0;i<f;i++) d.push(null); for(let i=1;i<=n;i++) d.push(i); return d; }
 
+/* ── Decorative background particles ── */
+function Particles() {
+  const dots = [];
+  for (let i = 0; i < 20; i++) {
+    dots.push(e("div", {
+      key: i,
+      style: {
+        position: "absolute",
+        width: Math.random() * 3 + 1,
+        height: Math.random() * 3 + 1,
+        borderRadius: "50%",
+        background: "var(--accent)",
+        opacity: Math.random() * 0.15 + 0.03,
+        left: Math.random() * 100 + "%",
+        top: Math.random() * 100 + "%",
+        animation: "float " + (3 + Math.random() * 4) + "s ease-in-out infinite",
+        animationDelay: -Math.random() * 4 + "s",
+      }
+    }));
+  }
+  return e("div", {
+    style: { position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" },
+    "aria-hidden": "true"
+  }, dots);
+}
+
+/* ── Decorative line separator ── */
+function Divider() {
+  return e("div", {
+    style: {
+      display: "flex", alignItems: "center", gap: 12,
+      margin: "24px 0", padding: "0 20px",
+    }
+  },
+    e("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, var(--accent), transparent)", opacity: 0.3 } }),
+    e("div", { style: { color: "var(--accent)", fontSize: 10, opacity: 0.5 } }, "✦"),
+    e("div", { style: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, var(--accent), transparent)", opacity: 0.3 } })
+  );
+}
+
 const s = {
-  header: { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px", background:"var(--bg-card)", borderBottom:"1px solid var(--border)", position:"sticky", top:0, zIndex:10 },
-  logoArea: { display:"flex", alignItems:"center", gap:12 },
-  logoCircle: { width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:14, letterSpacing:1 },
-  brandName: { fontSize:16, fontWeight:700, margin:0, letterSpacing:-0.3 },
-  tagline: { fontSize:11, color:"var(--fg-faint)", margin:0 },
-  backBtn: { background:"none", border:"none", color:"var(--accent)", fontSize:14, fontWeight:500, cursor:"pointer", padding:"4px 8px" },
-  content: { flex:1, padding:"0 20px 24px" },
-  heroBanner: { background:"linear-gradient(135deg, var(--accent-wash) 0%, var(--accent-wash-mid) 50%, var(--accent-wash) 100%)", borderRadius:16, padding:"32px 24px", textAlign:"center", margin:"16px 0" },
-  heroTitle: { fontSize:22, fontWeight:700, margin:0, letterSpacing:-0.5 },
-  heroSub: { fontSize:13, color:"var(--fg-muted)", margin:"8px 0 0", fontWeight:400 },
-  primaryAction: { width:"100%", padding:"18px 20px", background:"var(--fg)", color:"var(--bg)", border:"none", borderRadius:14, display:"flex", flexDirection:"column", alignItems:"center", gap:4, cursor:"pointer", fontSize:15 },
-  infoCards: { display:"flex", flexDirection:"column", gap:10 },
-  infoCard: { display:"flex", gap:14, padding:"14px 16px", background:"var(--bg-card)", borderRadius:12, border:"1px solid var(--border)", alignItems:"flex-start" },
-  infoIcon: { fontSize:20, marginTop:2 },
-  infoTitle: { fontSize:13, fontWeight:600, margin:0 },
-  infoText: { fontSize:12, color:"var(--fg-muted)", margin:"2px 0 0" },
-  policyBox: { marginTop:20, padding:"14px 16px", background:"var(--policy-bg)", borderRadius:12, border:"1px solid var(--policy-border)" },
+  header: {
+    display:"flex", justifyContent:"space-between", alignItems:"center",
+    padding:"16px 24px",
+    background: "var(--glass)",
+    backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+    borderBottom:"1px solid var(--glass-border)",
+    position:"sticky", top:0, zIndex:10,
+  },
+  logoArea: { display:"flex", alignItems:"center", gap:14 },
+  logoCircle: {
+    width:44, height:44, borderRadius:"50%",
+    overflow:"hidden",
+    boxShadow: "var(--glow-sm)",
+    flexShrink:0,
+  },
+  logoImg: {
+    width:"100%", height:"100%", objectFit:"cover", display:"block",
+  },
+  brandName: {
+    fontSize:18, fontWeight:700, margin:0, letterSpacing:-0.3,
+    fontFamily: "'Dancing Script', cursive",
+    color: "var(--accent-glow)",
+  },
+  tagline: { fontSize:11, color:"var(--fg-faint)", margin:0, fontWeight:300, letterSpacing:1, textTransform:"uppercase" },
+  backBtn: {
+    background:"none", border:"1px solid var(--border-accent)", color:"var(--accent)",
+    fontSize:13, fontWeight:500, cursor:"pointer", padding:"8px 16px",
+    borderRadius:20, letterSpacing:0.3, transition:"all 0.2s",
+  },
+  content: { flex:1, padding:"0 24px 32px", position:"relative", zIndex:1 },
+
+  /* ── Hero ── */
+  heroBanner: {
+    position:"relative", overflow:"hidden",
+    background: "linear-gradient(135deg, rgba(232,160,191,0.12) 0%, rgba(198,122,158,0.08) 50%, rgba(232,160,191,0.05) 100%)",
+    borderRadius:20, padding:"48px 28px 44px", textAlign:"center", margin:"20px 0 28px",
+    border:"1px solid var(--border-accent)",
+    backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
+  },
+  heroScript: {
+    fontSize:38, fontWeight:700, margin:0,
+    fontFamily: "'Dancing Script', cursive",
+    color: "var(--accent-glow)",
+    animation: "glowPulse 4s ease-in-out infinite",
+    lineHeight: 1.1,
+  },
+  heroTitle: {
+    fontSize:14, fontWeight:400, margin:"12px 0 0",
+    letterSpacing:3, textTransform:"uppercase",
+    color:"var(--fg-muted)",
+  },
+  heroLine: {
+    width:60, height:1, margin:"16px auto 0",
+    background:"linear-gradient(to right, transparent, var(--accent), transparent)",
+  },
+
+  /* ── CTA ── */
+  primaryAction: {
+    width:"100%", padding:"20px 24px",
+    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
+    color:"#fff", border:"none", borderRadius:16,
+    display:"flex", alignItems:"center", justifyContent:"center", gap:12,
+    cursor:"pointer", fontSize:16, fontWeight:600,
+    boxShadow: "var(--glow)",
+    transition:"all 0.3s ease",
+    letterSpacing:0.5,
+  },
+
+  /* ── Info cards ── */
+  infoCards: { display:"flex", flexDirection:"column", gap:12, marginTop:24 },
+  infoCard: {
+    display:"flex", gap:16, padding:"18px 20px",
+    background: "var(--bg-card)",
+    backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
+    borderRadius:16, border:"1px solid var(--glass-border)",
+    alignItems:"flex-start",
+    transition:"all 0.2s",
+  },
+  infoIcon: {
+    fontSize:18, marginTop:2,
+    width:36, height:36, borderRadius:10,
+    background:"var(--accent-wash-mid)",
+    display:"flex", alignItems:"center", justifyContent:"center",
+    flexShrink:0,
+  },
+  infoTitle: { fontSize:13, fontWeight:600, margin:0, letterSpacing:0.3 },
+  infoText: { fontSize:12, color:"var(--fg-muted)", margin:"4px 0 0", fontWeight:300, lineHeight:1.6 },
+  policyBox: {
+    marginTop:20, padding:"18px 20px",
+    background:"var(--policy-bg)", borderRadius:16,
+    border:"1px solid var(--policy-border)",
+  },
   policyTitle: { fontSize:13, fontWeight:600, margin:0, color:"var(--policy-title)" },
-  policyText: { fontSize:12, color:"var(--fg-muted)", margin:"4px 0 0" },
-  sectionTitle: { fontSize:18, fontWeight:700, margin:"20px 0 12px", letterSpacing:-0.3 },
-  serviceList: { display:"flex", flexDirection:"column", gap:10 },
-  serviceCard: { background:"var(--bg-card)", border:"1px solid var(--border)", borderRadius:14, padding:"16px 18px", cursor:"pointer", textAlign:"left", width:"100%" },
+  policyText: { fontSize:12, color:"var(--fg-muted)", margin:"6px 0 0", fontWeight:300, lineHeight:1.6 },
+
+  /* ── Services ── */
+  sectionTitle: {
+    fontSize:22, fontWeight:600, margin:"24px 0 16px", letterSpacing:-0.5,
+    fontFamily: "'Dancing Script', cursive",
+    color: "var(--accent-glow)",
+  },
+  serviceList: { display:"flex", flexDirection:"column", gap:14 },
+  serviceCard: {
+    background:"var(--bg-card)",
+    backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
+    border:"1px solid var(--glass-border)",
+    borderRadius:18, padding:"20px 22px", cursor:"pointer", textAlign:"left", width:"100%",
+    transition:"all 0.3s ease",
+    position:"relative", overflow:"hidden",
+  },
   serviceTop: { display:"flex", justifyContent:"space-between", alignItems:"center" },
-  serviceName: { fontSize:15, fontWeight:600, margin:0 },
-  servicePrice: { fontSize:15, fontWeight:700, color:"var(--accent)" },
-  serviceDesc: { fontSize:12, color:"var(--fg-faint)", margin:"6px 0" },
+  serviceName: { fontSize:16, fontWeight:600, margin:0, letterSpacing:-0.2 },
+  servicePrice: {
+    fontSize:18, fontWeight:700,
+    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-glow) 100%)",
+    WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
+    backgroundClip:"text",
+  },
+  serviceDesc: { fontSize:12, color:"var(--fg-faint)", margin:"8px 0 12px", fontWeight:300, lineHeight:1.6 },
   serviceBottom: { display:"flex", justifyContent:"space-between", alignItems:"center" },
-  serviceDuration: { fontSize:12, color:"var(--fg-ghost)" },
-  comingSoon: { textAlign:"center", fontSize:13, color:"var(--fg-ghost)", marginTop:20, padding:12, background:"var(--coming-bg)", borderRadius:10, border:"1px dashed var(--coming-border)" },
-  selectedBanner: { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"12px 16px", background:"var(--bg-card)", borderRadius:12, border:"1px solid var(--border)", margin:"16px 0 8px", fontSize:14 },
-  calendar: { background:"var(--bg-card)", borderRadius:14, padding:16, border:"1px solid var(--border)" },
-  calHeader: { display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 },
-  calMonth: { fontSize:15, fontWeight:600 },
-  calNav: { background:"none", border:"none", fontSize:22, cursor:"pointer", color:"var(--accent)", padding:"4px 12px", fontWeight:700 },
+  serviceDuration: { fontSize:11, color:"var(--fg-ghost)", fontWeight:400, letterSpacing:0.5, textTransform:"uppercase" },
+  serviceArrow: { color:"var(--accent)", fontSize:16, opacity:0.5, transition:"all 0.2s" },
+  serviceIcon: { fontSize:24, marginBottom:8 },
+  comingSoon: {
+    textAlign:"center", fontSize:13, color:"var(--fg-ghost)", marginTop:24,
+    padding:"16px", background:"var(--coming-bg)", borderRadius:14,
+    border:"1px dashed var(--coming-border)",
+    fontWeight:300, letterSpacing:0.5,
+  },
+
+  /* ── Booking flow ── */
+  selectedBanner: {
+    display:"flex", justifyContent:"space-between", alignItems:"center",
+    padding:"14px 18px", background:"var(--bg-card)",
+    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
+    borderRadius:14, border:"1px solid var(--glass-border)",
+    margin:"20px 0 8px", fontSize:14,
+  },
+  calendar: {
+    background:"var(--bg-card)",
+    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
+    borderRadius:18, padding:20,
+    border:"1px solid var(--glass-border)",
+  },
+  calHeader: { display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 },
+  calMonth: { fontSize:16, fontWeight:600, letterSpacing:-0.3 },
+  calNav: {
+    background:"none", border:"1px solid var(--border-accent)", fontSize:18,
+    cursor:"pointer", color:"var(--accent)", padding:"6px 14px", fontWeight:600,
+    borderRadius:10, transition:"all 0.2s",
+  },
   calDays: { display:"grid", gridTemplateColumns:"repeat(7, 1fr)", gap:2 },
-  calDayLabel: { fontSize:11, fontWeight:600, color:"var(--fg-ghost)", textAlign:"center", padding:"4px 0" },
+  calDayLabel: { fontSize:11, fontWeight:500, color:"var(--fg-ghost)", textAlign:"center", padding:"6px 0", letterSpacing:0.5 },
   calGrid: { display:"grid", gridTemplateColumns:"repeat(7, 1fr)", gap:4 },
-  calDay: { width:"100%", aspectRatio:"1", border:"none", borderRadius:10, fontSize:13, fontWeight:500, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", color:"var(--fg)" },
+  calDay: {
+    width:"100%", aspectRatio:"1", border:"none", borderRadius:12,
+    fontSize:13, fontWeight:500, cursor:"pointer",
+    display:"flex", alignItems:"center", justifyContent:"center",
+    background:"transparent", color:"var(--fg)",
+    transition:"all 0.15s",
+  },
   calDayEmpty: { cursor:"default" },
   calDayDisabled: { color:"var(--disabled)", cursor:"not-allowed" },
   calDayAvailable: { background:"var(--accent-wash)" },
-  calDaySelected: { background:"var(--accent)", color:"#fff", fontWeight:700 },
-  slotGrid: { display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:10 },
-  slotBtn: { padding:"14px 8px", borderRadius:12, border:"1px solid var(--border)", background:"var(--bg-card)", fontSize:15, fontWeight:500, cursor:"pointer", textAlign:"center", color:"var(--fg)" },
-  slotBtnSelected: { background:"var(--accent)", color:"#fff", borderColor:"var(--accent)" },
-  formGroup: { marginBottom:16 },
-  label: { fontSize:13, fontWeight:500, display:"block", marginBottom:6, color:"var(--fg-muted)" },
-  input: { width:"100%", padding:"12px 14px", borderRadius:12, border:"1px solid var(--input-border)", fontSize:15, outline:"none", boxSizing:"border-box", fontFamily:"inherit", background:"var(--bg-card)", color:"var(--fg)" },
-  summaryBox: { background:"var(--accent-wash)", borderRadius:14, padding:"16px 18px", margin:"20px 0" },
-  summaryTitle: { fontSize:14, fontWeight:700, margin:"0 0 10px" },
-  summaryRow: { display:"flex", justifyContent:"space-between", fontSize:13, padding:"6px 0", borderBottom:"1px solid var(--border-accent)" },
-  summaryLabel: { color:"var(--fg-faint)" },
-  confirmBtn: { width:"100%", padding:16, borderRadius:14, border:"none", background:"var(--fg)", color:"var(--bg)", fontSize:16, fontWeight:600, cursor:"pointer" },
-  confirmationCard: { flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"40px 24px" },
-  h2: { fontSize:20, fontWeight:700, margin:0 },
-  confirmText: { fontSize:14, color:"var(--fg-muted)", textAlign:"center", margin:"8px 0 20px" },
-  confirmDetail: { width:"100%", background:"var(--bg-card)", borderRadius:14, border:"1px solid var(--border)", padding:"16px 18px" },
-  confirmRow: { display:"flex", justifyContent:"space-between", fontSize:13, padding:"8px 0", borderBottom:"1px solid var(--border)" },
-  confirmLabel: { color:"var(--fg-faint)" },
-  whatsappBanner: { display:"flex", alignItems:"center", gap:10, background:"var(--whatsapp-bg)", borderRadius:12, padding:"12px 16px", marginTop:16, width:"100%", boxSizing:"border-box" },
-  btnSecondary: { marginTop:20, padding:"12px 32px", borderRadius:12, border:"1px solid var(--input-border)", background:"var(--bg-card)", fontSize:14, fontWeight:500, cursor:"pointer", color:"var(--fg-muted)" },
-  footer: { padding:"20px 24px", textAlign:"center", borderTop:"1px solid var(--border)", background:"var(--bg-card)", marginTop:"auto" },
-  footerLink: { fontSize:12, color:"var(--accent)", cursor:"pointer", fontWeight:500 },
+  calDaySelected: {
+    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
+    color:"#fff", fontWeight:700,
+    boxShadow:"var(--glow-sm)",
+  },
+  slotGrid: { display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:12 },
+  slotBtn: {
+    padding:"16px 8px", borderRadius:14,
+    border:"1px solid var(--glass-border)",
+    background:"var(--bg-card)",
+    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
+    fontSize:15, fontWeight:500, cursor:"pointer", textAlign:"center",
+    color:"var(--fg)", transition:"all 0.2s",
+  },
+  slotBtnSelected: {
+    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
+    color:"#fff", borderColor:"transparent",
+    boxShadow:"var(--glow-sm)",
+  },
+  formGroup: { marginBottom:20 },
+  label: { fontSize:12, fontWeight:500, display:"block", marginBottom:8, color:"var(--fg-muted)", letterSpacing:0.5, textTransform:"uppercase" },
+  input: {
+    width:"100%", padding:"14px 18px", borderRadius:14,
+    border:"1px solid var(--input-border)", fontSize:15,
+    outline:"none", boxSizing:"border-box", fontFamily:"inherit",
+    background:"var(--input-bg)", color:"var(--fg)",
+    transition:"border-color 0.2s",
+  },
+  summaryBox: {
+    background:"var(--accent-wash-mid)", borderRadius:18, padding:"20px 22px", margin:"24px 0",
+    border:"1px solid var(--border-accent)",
+  },
+  summaryTitle: {
+    fontSize:16, fontWeight:600, margin:"0 0 12px",
+    fontFamily:"'Dancing Script', cursive",
+    color:"var(--accent-glow)",
+  },
+  summaryRow: { display:"flex", justifyContent:"space-between", fontSize:13, padding:"8px 0", borderBottom:"1px solid var(--border-accent)" },
+  summaryLabel: { color:"var(--fg-faint)", fontWeight:300 },
+  confirmBtn: {
+    width:"100%", padding:18, borderRadius:16, border:"none",
+    background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
+    color:"#fff", fontSize:16, fontWeight:600, cursor:"pointer",
+    boxShadow:"var(--glow)", transition:"all 0.3s",
+    letterSpacing:0.5,
+  },
+  confirmationCard: {
+    flex:1, display:"flex", flexDirection:"column", alignItems:"center",
+    justifyContent:"center", padding:"48px 28px",
+  },
+  h2: { fontSize:22, fontWeight:600, margin:0, fontFamily:"'Dancing Script', cursive" },
+  confirmText: { fontSize:14, color:"var(--fg-muted)", textAlign:"center", margin:"12px 0 24px", fontWeight:300, lineHeight:1.6 },
+  confirmDetail: {
+    width:"100%", background:"var(--bg-card)",
+    backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)",
+    borderRadius:18, border:"1px solid var(--glass-border)", padding:"20px 22px",
+  },
+  confirmRow: { display:"flex", justifyContent:"space-between", fontSize:13, padding:"10px 0", borderBottom:"1px solid var(--border)" },
+  confirmLabel: { color:"var(--fg-faint)", fontWeight:300 },
+  whatsappBanner: {
+    display:"flex", alignItems:"center", gap:12,
+    background:"var(--whatsapp-bg)", borderRadius:14,
+    padding:"14px 18px", marginTop:20, width:"100%", boxSizing:"border-box",
+    border:"1px solid rgba(129,199,132,0.15)",
+  },
+  btnSecondary: {
+    marginTop:24, padding:"14px 36px", borderRadius:14,
+    border:"1px solid var(--border-accent)",
+    background:"transparent", fontSize:14, fontWeight:500, cursor:"pointer",
+    color:"var(--accent)", transition:"all 0.2s",
+    letterSpacing:0.3,
+  },
+  footer: {
+    padding:"28px 24px", textAlign:"center",
+    borderTop:"1px solid var(--border)",
+    background:"var(--glass)",
+    backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)",
+    marginTop:"auto",
+  },
+  footerLink: { fontSize:12, color:"var(--accent)", cursor:"pointer", fontWeight:500, textDecoration:"none" },
 };
 
 function Footer() {
   return e("footer", { style: s.footer },
     e("div", null,
-      e("p", { style: { fontSize:11, color:"var(--fg-ghost)" } }, "@abigaillnails · Stokenchurch, Bucks"),
-      e("div", { style: { display:"flex", gap:16, justifyContent:"center", margin:"8px 0" } },
+      e("p", {
+        style: {
+          fontSize:16, color:"var(--accent-glow)",
+          fontFamily:"'Dancing Script', cursive",
+          marginBottom:4,
+        }
+      }, "abigaillnails"),
+      e("p", { style: { fontSize:11, color:"var(--fg-ghost)", letterSpacing:1, textTransform:"uppercase", fontWeight:300 } }, "Stokenchurch, Bucks"),
+      e("div", { style: { display:"flex", gap:20, justifyContent:"center", margin:"12px 0" } },
         e("a", { href:"https://www.instagram.com/abigaillnails/", target:"_blank", rel:"noopener", style: s.footerLink }, "Instagram"),
         e("span", { style: s.footerLink }, "WhatsApp")
       ),
-      e("p", { style: { fontSize:10, color:"var(--fg-faint)", marginTop:4 } }, "Built by Symplify Solutions")
+      e("div", { style: { width:40, height:1, margin:"12px auto", background:"linear-gradient(to right, transparent, var(--accent), transparent)", opacity:0.3 } }),
+      e("p", { style: { fontSize:10, color:"var(--fg-ghost)", fontWeight:300, letterSpacing:0.5 } }, "Built by Symplify Solutions")
     )
   );
 }
@@ -238,21 +515,22 @@ function App() {
   if (confirmed) {
     const dateStr = new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long" });
     return e("div", { id: "app-root", style: { display:"flex", flexDirection:"column", minHeight:"100vh" } },
-      e("div", { style: s.confirmationCard },
-        e("div", { style: { fontSize:48, marginBottom:16 } }, "✓"),
-        e("h2", { style: { ...s.h2, color:"var(--confirm-green)", marginBottom:8 } }, "Booking Confirmed!"),
-        e("p", { style: s.confirmText }, "Thank you, " + name + ". Your appointment has been booked."),
+      e(Particles),
+      e("div", { style: s.confirmationCard, className:"fade-up" },
+        e("div", { style: { fontSize:48, marginBottom:20, animation:"float 3s ease-in-out infinite" } }, "✨"),
+        e("h2", { style: { ...s.h2, color:"var(--confirm-green)", marginBottom:8, fontSize:26 } }, "You're Booked!"),
+        e("p", { style: s.confirmText }, "Thank you, " + name + ". Your appointment is confirmed."),
         e("div", { style: s.confirmDetail },
-          e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Service"), e("span", null, sel.name)),
-          e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Date"), e("span", null, dateStr)),
-          e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Time"), e("span", null, selSlot)),
-          e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Duration"), e("span", null, sel.duration))
+          e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Service"), e("span", { style:{fontWeight:500} }, sel.name)),
+          e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Date"), e("span", { style:{fontWeight:500} }, dateStr)),
+          e("div", { style: s.confirmRow }, e("span", { style: s.confirmLabel }, "Time"), e("span", { style:{fontWeight:500} }, selSlot)),
+          e("div", { style: {...s.confirmRow, borderBottom:"none"} }, e("span", { style: s.confirmLabel }, "Duration"), e("span", { style:{fontWeight:500} }, sel.duration))
         ),
         e("div", { style: s.whatsappBanner },
           e("span", { style: { fontSize:20 } }, "💬"),
-          e("span", { style: { fontSize:13 } }, "A WhatsApp confirmation will be sent to " + phone)
+          e("span", { style: { fontSize:13, fontWeight:300, lineHeight:1.5 } }, "A WhatsApp confirmation will be sent to " + phone)
         ),
-        e("p", { style: { fontSize:12, color:"var(--fg-faint)", marginTop:16, textAlign:"center" } }, "You'll also receive a reminder 24 hours before your appointment"),
+        e("p", { style: { fontSize:12, color:"var(--fg-faint)", marginTop:16, textAlign:"center", fontWeight:300 } }, "You'll receive a reminder 24 hours before"),
         e("button", { onClick: resetAll, style: s.btnSecondary }, "Back to Home")
       ),
       e(Footer)
@@ -260,13 +538,15 @@ function App() {
   }
 
   return e("div", { id: "app-root", style: { display:"flex", flexDirection:"column", minHeight:"100vh" } },
+    e(Particles),
+
     // Header
     e("header", { style: s.header },
       e("div", { style: s.logoArea },
-        e("div", { style: s.logoCircle }, "AN"),
+        e("div", { style: s.logoCircle }, e("img", { src:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/7QCEUGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAGgcAigAYkZCTUQwYTAwMGFjNDAxMDAwMDNlMDMwMDAwYmEwNDAwMDBjNjA0MDAwMGQyMDQwMDAwNzMwNjAwMDA5ZjA5MDAwMGY4MDkwMDAwMGEwYTAwMDAxOTBhMDAwMDJjMGUwMDAwAP/bAIQABQYGCwgLCwsLCw0LCwsNDg4NDQ4ODw0ODg4NDxAQEBEREBAQEA8TEhMPEBETFBQTERMWFhYTFhUVFhkWGRYWEgEFBQUKBwoICQkICwgKCAsKCgkJCgoMCQoJCgkMDQsKCwsKCw0MCwsICwsMDAwNDQwMDQoLCg0MDQ0MExQTExOc/8IAEQgAlgCWAwEiAAIRAQMRAf/EAI8AAAICAwEAAAAAAAAAAAAAAAMEAgcAAQUGAQEBAQAAAAAAAAAAAAAAAAAAAQIQAAEDAgMCCgYIBwAAAAAAAAEAAhEDEBIhMSBRBBMiMkFhcXKBkTAzQmCx0SNQUmKhs8HwFHCCorLC4REAAgIBAgYCAwEBAAAAAAAAAAERITEQQVFhcYGRobHwIMHR4fH/2gAMAwEAAhADEAAAAfC5ms3YDJLgiKJj6RzrkRZCD54TpS55AvOeTEo7jYxatVWrL4TM0sUGUkmmYlaK3ONm2IXA4MUbEU2s6ic3MLYS1KstNfB6yMqi5wpHopNj4hzGlTLh9hbAxMEFz3eYLMjLULVqi108DDcZoAp4ZAwUOyNkFNjAMCCCQHtRc11FJ5uNZatV2oV7CUJV4RkjSrCp6UHP9UcjocvrACb0ciGkAEBHs3m9rK0Kxs6K7CQKhcJJF4MNiXZ53Gr2J/KejjS/CdB8r2PlazQ/SnAw8I3ZdaWWtbAMMN3uaNGwJlo3nyspH1Pn+rLzNmYX0PlCrXJ+P0+edBYBJZWbV9oLX4G1UEVaAYMzHPKLLHz87oyljIAnmx1CQmjWiLQS06stM8AAwFXhPYJ1RhE130azr8rowcBFDQiRojAgxrGIgrTqa2aruFj5LWULQxKwlZuFaI2zhU3QsnCtVrTwqmdp5VVHs7IrQNo4VNbOZZ//2gAIAQEAAQUCu42Nm1EDfEFiFinXGwbEoOsxFGVgXFrCQpT7i5sbgKmE+xkLEg6z9p9imtQChNRUIiVhQbZ9gNh92C2qi0KFFin2Gw+7CiUDCL1KBhSjYpyGy67VitCiwKmzrBHYKFgjSJbTZjXElPovYcDsOAxZ+2U1G3BqgCwGm9jiuFOJTc6Dx9DZ5nYGw1FFDNp+lZGWGaLPU1PUynO2zYUynZI0nKm0qhW4tNczDSJBDopvqjBGOzaL3KCNkqhTLjhwp1SRS5nAPWteg9cEd9OqRALKRov0GZVCvxyc3CUbEpq/jKifxbxQ9XwD1otwP16hVzNdzJpcH4TxQVZ2JyKhQqWEIhTApPDWA4U9weWwFwR4ZVhMfxaoVA1UeEcUXtpFSAhsGzWOemNxEsMkQmUy5UmYlCwmC0w4LBygJTmFpsLOu0wpMqSFTeW2xnCXGCps0I2FjY3NghY3DUclqgEbHYaU8XajsTC1ubuQsE6wQTrhG7srf//aAAgBAxABPwH3k//aAAgBAhABPwH3k//aAAgBAQAGPwL+ReOOSDE9agarVQdQi6OSEHRkZg9npodzKktd4xB8DmsLtWkizH/bYJ7zeSfgqnfp/B6pd6p/r6Ydp/RNqe0zkP8ALkHyy8F2rrpunwqf9A81U79P4OVLvVP9fR6W5py16kGgOxaxHQnbnNLSP3uK5UyN0Qe3cngh3LaRAGe8HzTmwZLmnq5M/NMZmC0uOn2o+S5IJjXLotyWk9gUHI7RA50ZfvfGizEHcsPXPWuEdxv5jUO5U/Ldel2j/G0OzYdfmOsKuw+zSqfAKfJShSqmZyY885h6M/s7woOoMHagkPG54xfHP8UXBvFuGo1aR1TmOxcI7jfzGodYePEscBen2j4Xr/doOb4tY0H8U1w9lxa7+rNv6qoMDHYmxmOsWcd52TjnTKN65wtWBOb2gDwcD+iBGRCxc0nUdE9XyW/4JjnHIGT0rUfj8lIzcNNw61UxHnU3t35uRyDmuEOadHD99Klji37rhP8AcNfILLz2zAnCJPYgFHTYx7IlGOi2LoU9GlsKgalFpyI9Di6bZLIxbD0aqOj3B//aAAgBAQEBPyHWIxpU5I6aJNXxDmfiv8DGlk61TsYcdiXEXMZKcil+c8aMZEqiBs8CwYbYvB4ihy1MdF+DQtGJtVQuPRnz50GjHWer61FGVaJF+DYcgSCdJNhBBWSEwQJGdgKWh6XkT8sDMmUE09KLINMjDvQ2r03GZj7gDUpsJ7qeguNEOMfNYExwk5dxoryKcGMpEm5VN4WZuHFGzT0kVvJRM10GiB4WiGK9GPsNfXRhjn45pO9j7GJxU4dk/TyhR5lJT4x7gufI+h2PuZiyINLtk4WqaNwMS9Dbn2DYLuUHMUvKk+aCi/Ml2Vv3BbWx6VR8jQpaC7hrrRC/Dxr9+Mm1uQH4B8l8LobTFJxTwSlb7OagnUnqAVPrA0OoknuMC4qV23U0MLneCTiBwSJ9DA7mthOM3ybEmTCmj4NzQmlnJxwpGJ5y2M9y4xzUNGU0012dkCQ86MZGDRw26pc0vRWTZrnBQ12djN1ET2U1E5jeB5Pm7EIuUDRzLWxItFd0vRkXHDosGac8VQ+jUMSxLbjsy/dGSzaUzv8AbMAm4m+42dMxlDGIhpHNOH70yJ0EEpRHs1jrR2QakTaW2TibGJu5NNYxocx91vRDu3BsEeOrwUi1K26XViUU5lH9ARo+NXKO6OnVC2kjVztOTjivKQnLpW8Qc3xi1GHqoN00ZUlDumlcrcQsM5uV6gaMSczl4XRb9yOUhYbl7LivIezDYTTWU1aY7UYmB3ZcJhN8FbODIme1e056EISWQ2w+HMS/5AhueEW8jy1tsndjpoYBw5RRMT3Y5j0Bxe6adpLTtHcDNl0lSdWHMnyRHRcebMBCckCEiB3YBsm/sgHdxZjfRxqVGzlYHSTyskj3L9F99DsDCsTLiuYppvhHtwLFUcTzMLytzIknxT9OCeRSpvalI90iWJJc2KZkNNcGqEhsYehDf8GNKcNOmhxJSjTl8VgzPP5FmGujj7kYWSpw4oT9nCLeX1GQO0xNScJKZlzx30ltnoNzpepBUyPYsD0XQxh2PSdINsSjRgb1saomX4D0MNyMRQJGEP6h5GxWNqq/u+hrVYkbKaMCNoVn/9oADAMBAAIQAxEAABAVo+a12H/WKwMSOUs+ukCj8NFXXkfQlJqMOU2w7yjJo99tT2Gwt5NdgkODzMqoNReu7mE+pGPMl9+SycuBItzLtAvsgKONKLMANOH/2gAIAQMQAT8Q+pT9Xj0JQ2v/2gAIAQIQAT8Q2x7u/wD/2gAIAQEBAT8Q0RCgShO/7GivJDQ+UhFlo2uIplTlyU7TnSoxhpWrEzy+Tj7LTQssp+SK4GJErBxEQjc+oxBnD3XAUkkStYU9ydt/ssr+4/0cnvxMuHxfaLT2IRSsT5MorrPZD2tT47EyshTKFDLMahLRnfBEhEIeJUSEiSfAY7jusm8cxSuylz8hGlcwQjjLLCzGNmIkgqCSEqDyKIyaZVyLbDiOtCoUiAUG9GQVjazA4USYmhXKIhPSOBWg4xIjgWjpE1I2NlhfoJQ3yCR4dG8DKVsJRgjDmUDeQmklyJ0PTfA/g+/+iUx4QTqaDttqJ5SYPiPG90oJzzWB7nBvSdfKBbSeauTWzalGUEN+3V+gDHLrMzTqbpTKZQxC0anOiwgY80f1GIGjrR9OhNr6/BSww+ccTcX/AAGSi535AfXoH6sNSmIDWiIodlp2EsaDZEnf9jHglun80DoFe2g0TvcXsE+AZe9e/wBfvvwewQbaGYEUKJ8DY09jLhZ/ZO3uFfJ8BWm3BrfxzOFF3T/Qb0WIcgm0Tl/ZH0CqrY9MSiI7oUzKBOJbEjm67HFpoVT3O5GkEySNrP0bF5S+Y+WWZVZZ+gLA5Y/TdQr7DSj3qzQIf7KH9wxY7BsyHGBGg7P6S3e4RMAvLXLAXoKBHwd7sJU8ZPKwX/4FZ+xWk1CN0tMgkCSGgW4q/wCaGQYiF+JhfN9w3iuNpUr3iC5r2EraVJOFpTOcofY2AB3YWM5GwIgHZGJfs3ORGcl1GBCD8YpgQymiPw0nkloZUbzzw7++L2IIfqEE+zMaCVLBFvQvegMPZhk15HD5fknOKkJg4DOOI2GViwFi3iO5vxfcbt93Y+40+141vYhQHGGQDXMnYu8gfk3yyad29EzZ5NHQzVfbHy0gSmudzdIc04Yint2AS4lwNg8VDhK3FoPsdXsNzW0DkZNsQiXF9n8hyM+aXABI21kj3BkEY3AGXR/oERX1frv1KcQN7fHQy73obKbGFUQO49I5yJFDeOiTbug5wSd7DG5uS0QjTtYLiEM7DBKGwnB7i9Wdw/8AT+jNh7pNSKWeTL2HI8Kz7Ce2NNzILg2mXlbEzxtTJeRr/Di8z2hzsQZBu/Kiy8CG0W75Zl8ECPt1LnoanohxvboxQalmIafIuFl0c6bekOWZ5s35P2e9UwmMdXljBQbCXAxiTScKErjFr2QtytF4YfZzipgb/wC9IjEjtpSlKY4Kc+z5UuCM9COBa6k8WN9b6BIGFMNosHg9mPJCToaGPAVIF+i0vSJv2ZRj79ZaPAwYWiahiGw+sqPsPJ/DwQJHiFB2qKKC9bfI1qzuMa8EX6X3crnwx3JWku4hov5P2tOsmufzoJLFggRsLxBZpcROAtc38D9wXI//2Q==", alt:"Nail Studio by Abigail", style:s.logoImg })),
         e("div", null,
           e("h1", { style: s.brandName }, "abigaillnails"),
-          e("p", { style: s.tagline }, "Stokenchurch, Bucks")
+          e("p", { style: s.tagline }, "Stokenchurch")
         )
       ),
       view !== "home" && e("button", { onClick: goBack, style: s.backBtn }, "← Back")
@@ -274,43 +554,46 @@ function App() {
 
     // HOME
     view === "home" && e("div", { style: s.content },
-      e("div", { style: s.heroBanner },
-        e("h2", { style: s.heroTitle }, "Book Your Appointment"),
-        e("p", { style: s.heroSub }, "Home-based nail care in the heart of the Chilterns")
+      e("div", { style: s.heroBanner, className:"fade-up" },
+        e("h2", { style: s.heroScript }, "nails by Abigail"),
+        e("p", { style: s.heroTitle }, "home-based nail care"),
+        e("div", { style: s.heroLine })
       ),
-      e("div", { style: { marginBottom:20 } },
+      e("div", { style: { marginBottom:8 }, className:"fade-up fade-up-1" },
         e("button", { onClick: () => setView("services"), style: s.primaryAction },
-          e("span", { style: { fontSize:22 } }, "💅"),
-          e("span", { style: { fontWeight:600 } }, "Book Now"),
-          e("span", { style: { fontSize:12, color:"var(--fg-faint)" } }, "View services & availability")
+          e("span", { style: { fontSize:16 } }, "Book Your Appointment"),
+          e("span", { style: { fontSize:20 } }, "→")
         )
       ),
+
+      e(Divider),
+
       e("div", { style: s.infoCards },
-        e("div", { style: s.infoCard },
-          e("span", { style: s.infoIcon }, "📍"),
+        e("div", { style: s.infoCard, className:"fade-up fade-up-2" },
+          e("div", { style: s.infoIcon }, "📍"),
           e("div", null,
             e("p", { style: s.infoTitle }, "Location"),
             e("p", { style: s.infoText }, "Home-based in Stokenchurch, Buckinghamshire. Address shared upon booking.")
           )
         ),
-        e("div", { style: s.infoCard },
-          e("span", { style: s.infoIcon }, "⏰"),
+        e("div", { style: s.infoCard, className:"fade-up fade-up-3" },
+          e("div", { style: s.infoIcon }, "⏰"),
           e("div", null,
             e("p", { style: s.infoTitle }, "Opening Hours"),
             e("p", { style: s.infoText }, "Mon–Fri, 9:00–18:00. Appointments only.")
           )
         ),
-        e("div", { style: s.infoCard },
-          e("span", { style: s.infoIcon }, "💬"),
+        e("div", { style: s.infoCard, className:"fade-up fade-up-4" },
+          e("div", { style: s.infoIcon }, "💬"),
           e("div", null,
             e("p", { style: s.infoTitle }, "Get in Touch"),
             e("p", { style: s.infoText }, "WhatsApp for enquiries, changes, or cancellations.")
           )
         )
       ),
-      e("div", { style: s.policyBox },
+      e("div", { style: s.policyBox, className:"fade-up fade-up-5" },
         e("p", { style: s.policyTitle }, "Booking Policy"),
-        e("p", { style: s.policyText }, "Please provide at least 24 hours' notice for cancellations or changes. Late cancellations or no-shows may affect future booking availability.")
+        e("p", { style: s.policyText }, "Please provide at least 24 hours’ notice for cancellations or changes. Late cancellations or no-shows may affect future booking availability.")
       )
     ),
 
@@ -318,101 +601,114 @@ function App() {
     view === "services" && e("div", { style: s.content },
       e("h2", { style: s.sectionTitle }, "Choose a Service"),
       e("div", { style: s.serviceList },
-        SERVICES.map(sv =>
-          e("button", { key: sv.id, onClick: () => { setSel(sv); setView("book-date"); }, style: s.serviceCard },
+        SERVICES.map(function(sv, idx) {
+          return e("button", {
+            key: sv.id,
+            onClick: function() { setSel(sv); setView("book-date"); },
+            style: s.serviceCard,
+            className: "fade-up fade-up-" + (idx + 1)
+          },
+            e("div", { style: { fontSize:28, marginBottom:8 } }, sv.icon),
             e("div", { style: s.serviceTop },
               e("h3", { style: s.serviceName }, sv.name),
               e("span", { style: s.servicePrice }, sv.price)
             ),
             e("p", { style: s.serviceDesc }, sv.desc),
             e("div", { style: s.serviceBottom },
-              e("span", { style: s.serviceDuration }, "⏱ " + sv.duration)
+              e("span", { style: s.serviceDuration }, "⏱ " + sv.duration),
+              e("span", { style: s.serviceArrow }, "→")
             )
-          )
-        )
+          );
+        })
       ),
-      e("p", { style: s.comingSoon }, "🧖‍♀️ Facials — Coming Soon")
+      e("p", { style: s.comingSoon, className:"fade-up fade-up-5" }, "🧖‍♀️ Facials — Coming Soon")
     ),
 
     // DATE PICKER
     view === "book-date" && sel && e("div", { style: s.content },
-      e("div", { style: s.selectedBanner },
+      e("div", { style: s.selectedBanner, className:"fade-up" },
         e("span", { style: { fontWeight:600 } }, sel.name),
         e("span", { style: { color:"var(--accent)" } }, sel.price + " · " + sel.duration)
       ),
       e("h2", { style: s.sectionTitle }, "Pick a Date"),
-      e("div", { style: s.calendar },
+      e("div", { style: s.calendar, className:"fade-up fade-up-1" },
         e("div", { style: s.calHeader },
           e("button", { onClick: prevMonth, style: s.calNav }, "‹"),
           e("span", { style: s.calMonth }, MONTHS[cMonth] + " " + cYear),
           e("button", { onClick: nextMonth, style: s.calNav }, "›")
         ),
         e("div", { style: s.calDays },
-          DAYS.map(d => e("div", { key: d, style: s.calDayLabel }, d))
+          DAYS.map(function(d) { return e("div", { key: d, style: s.calDayLabel }, d); })
         ),
         e("div", { style: s.calGrid },
-          days.map((day, i) =>
-            e("button", {
+          days.map(function(day, i) {
+            return e("button", {
               key: i,
               disabled: !isAvail(day),
-              onClick: () => { if (isAvail(day)) { setSelDate(day); setView("book-slot"); } },
-              style: {
-                ...s.calDay,
-                ...(day === null ? s.calDayEmpty : {}),
-                ...(!isAvail(day) && day !== null ? s.calDayDisabled : {}),
-                ...(isAvail(day) ? s.calDayAvailable : {}),
-                ...(selDate === day && day !== null ? s.calDaySelected : {}),
-              }
-            }, day || "")
-          )
+              onClick: function() { if (isAvail(day)) { setSelDate(day); setView("book-slot"); } },
+              style: Object.assign({},
+                s.calDay,
+                day === null ? s.calDayEmpty : {},
+                !isAvail(day) && day !== null ? s.calDayDisabled : {},
+                isAvail(day) ? s.calDayAvailable : {},
+                selDate === day && day !== null ? s.calDaySelected : {}
+              )
+            }, day || "");
+          })
         )
       )
     ),
 
     // TIME SLOTS
     view === "book-slot" && sel && selDate && e("div", { style: s.content },
-      e("div", { style: s.selectedBanner },
+      e("div", { style: s.selectedBanner, className:"fade-up" },
         e("span", { style: { fontWeight:600 } }, sel.name),
         e("span", { style: { color:"var(--accent)" } }, new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short" }))
       ),
       e("h2", { style: s.sectionTitle }, "Choose a Time"),
       e("div", { style: s.slotGrid },
-        SLOTS.map(slot =>
-          e("button", {
+        SLOTS.map(function(slot, idx) {
+          return e("button", {
             key: slot,
-            onClick: () => { setSelSlot(slot); setView("book-details"); },
-            style: { ...s.slotBtn, ...(selSlot === slot ? s.slotBtnSelected : {}) }
-          }, slot)
-        )
+            onClick: function() { setSelSlot(slot); setView("book-details"); },
+            style: Object.assign({}, s.slotBtn, selSlot === slot ? s.slotBtnSelected : {}),
+            className: "fade-up fade-up-" + (idx < 5 ? idx + 1 : 5)
+          }, slot);
+        })
       ),
-      e("p", { style: { fontSize:12, color:"var(--fg-faint)", textAlign:"center", marginTop:12 } }, "Slots shown are examples — live availability will sync with Abigail's calendar")
+      e("p", { style: { fontSize:11, color:"var(--fg-faint)", textAlign:"center", marginTop:16, fontWeight:300, letterSpacing:0.3 } }, "Slots shown are examples — live availability will sync with Abigail’s calendar")
     ),
 
     // DETAILS FORM
     view === "book-details" && sel && selDate && selSlot && e("div", { style: s.content },
-      e("div", { style: s.selectedBanner },
+      e("div", { style: s.selectedBanner, className:"fade-up" },
         e("span", { style: { fontWeight:600 } }, sel.name),
         e("span", { style: { color:"var(--accent)" } }, new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short" }) + " at " + selSlot)
       ),
       e("h2", { style: s.sectionTitle }, "Your Details"),
-      e("div", { style: s.formGroup },
+      e("div", { style: s.formGroup, className:"fade-up fade-up-1" },
         e("label", { style: s.label }, "Full Name"),
-        e("input", { id: "name-input", type:"text", value: name, onChange: ev => setName(ev.target.value), placeholder:"e.g. Sarah Jones", style: s.input })
+        e("input", { id: "name-input", type:"text", value: name, onChange: function(ev) { setName(ev.target.value); }, placeholder:"e.g. Sarah Jones", style: s.input })
       ),
-      e("div", { style: s.formGroup },
-        e("label", { style: s.label }, "Phone Number (for WhatsApp confirmation)"),
-        e("input", { id: "phone-input", type:"tel", value: phone, onChange: ev => setPhone(ev.target.value), placeholder:"e.g. 07700 900123", style: s.input })
+      e("div", { style: s.formGroup, className:"fade-up fade-up-2" },
+        e("label", { style: s.label }, "Phone Number"),
+        e("input", { id: "phone-input", type:"tel", value: phone, onChange: function(ev) { setPhone(ev.target.value); }, placeholder:"e.g. 07700 900123", style: s.input })
       ),
-      e("div", { style: s.summaryBox },
+      e("div", { style: s.summaryBox, className:"fade-up fade-up-3" },
         e("p", { style: s.summaryTitle }, "Booking Summary"),
-        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Service"), e("span", null, sel.name)),
-        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Date"), e("span", null, new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long" }))),
-        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Time"), e("span", null, selSlot)),
-        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Duration"), e("span", null, sel.duration)),
-        e("div", { style: { ...s.summaryRow, borderBottom:"none", fontWeight:600 } }, e("span", null, "Price"), e("span", null, sel.price))
+        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Service"), e("span", { style:{fontWeight:500} }, sel.name)),
+        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Date"), e("span", { style:{fontWeight:500} }, new Date(cYear, cMonth, selDate).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long" }))),
+        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Time"), e("span", { style:{fontWeight:500} }, selSlot)),
+        e("div", { style: s.summaryRow }, e("span", { style: s.summaryLabel }, "Duration"), e("span", { style:{fontWeight:500} }, sel.duration)),
+        e("div", { style: { ...s.summaryRow, borderBottom:"none", fontWeight:700, fontSize:15 } }, e("span", null, "Total"), e("span", { style:{color:"var(--accent)"} }, sel.price))
       ),
-      e("button", { onClick: handleConfirm, disabled: !name.trim() || !phone.trim(), style: { ...s.confirmBtn, opacity: (!name.trim() || !phone.trim()) ? 0.5 : 1 } }, "Confirm Booking"),
-      e("p", { style: { fontSize:11, color:"var(--fg-faint)", textAlign:"center", marginTop:8 } }, "By booking, you agree to the cancellation policy")
+      e("button", {
+        onClick: handleConfirm,
+        disabled: !name.trim() || !phone.trim(),
+        style: Object.assign({}, s.confirmBtn, { opacity: (!name.trim() || !phone.trim()) ? 0.4 : 1 }),
+        className:"fade-up fade-up-4"
+      }, "Confirm Booking"),
+      e("p", { style: { fontSize:11, color:"var(--fg-faint)", textAlign:"center", marginTop:10, fontWeight:300 } }, "By booking, you agree to the cancellation policy")
     ),
 
     e(Footer)
